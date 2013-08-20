@@ -19,7 +19,7 @@ setup(
 
     name='genius',
     description='genius中文分词 Chinese Segment On linear-chain CRF',
-    version='2.0.0',
+    version='2.0.1',
     author='duanhongyi',
     author_email='duanhyi@gmail.com',
     packages=find_packages(),
