@@ -12,8 +12,9 @@ Feature
 * 支持词性标注
 
 Install
-=========
-* setuptools>=1.0
+==========
+* 安装git: 1) ubuntu or debian `apt-get install git` 2) fedora or redhat `yum install git`
+* 升级pip和setuptools执行命令: `pip install easy_install` 和 `pip install pip --upgrade`
 * pip install https://github.com/duanhongyi/genius/archive/master.zip
 * 通过import genius来引用
 
