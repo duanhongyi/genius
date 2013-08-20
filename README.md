@@ -28,7 +28,7 @@ Algorithm
 ==============
 
 * `genius.seg_text`函数接受5个参数: 
-* `text'第一个参数为需要分词的字符 
+* `text`第一个参数为需要分词的字符 
 * `use_break`代表对分词结构进行打断处理 
 * `use_combine`代表是否使用字典进行词合并
 * `use_tagging`代表是否进行词性标注
