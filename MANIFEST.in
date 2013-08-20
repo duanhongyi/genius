@@ -1,0 +1,4 @@
+include README.txt
+include MANIFEST.in
+include CHANGES.txt
+recursive-include genius/library *
