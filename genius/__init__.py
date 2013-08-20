@@ -1,6 +1,24 @@
 #encoding:utf-8
-
+import os
+import zipfile
 from .process import processes
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+
+def init_library():
+    zfile_path = os.path.join(here, 'library/library.zip')
+    if not os.path.exists(os.path.join(here, 'library/user_library/')):
+        zfile = zipfile.ZipFile(zfile_path, 'r')
+        for filename in zfile.namelist():
+            if filename.endswith('/'):
+                os.mkdir(os.path.join(here, 'library/%s' % filename))
+            else:
+                data = zfile.read(filename)
+                f = open(os.path.join(here, 'library/%s' % filename), 'w+b')
+                f.write(data)
+                f.close()
+init_library()
 
 
 def seg_text(text, **kwargs):

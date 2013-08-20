@@ -15,13 +15,6 @@ requires = [
 ]
 
 
-def unzip_library():
-    os.chdir(os.path.join(here, 'genius/library'))
-    check_call(['unzip', 'library.zip'])
-    os.chdir(here)
-unzip_library()
-
-
 setup(
 
     name='genius',

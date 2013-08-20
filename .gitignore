@@ -6,6 +6,9 @@
 # Packages
 *.egg
 *.egg-info
+genius/library/*.txt
+genius/library/*.dic
+genius/user_library
 dist
 build
 eggs
