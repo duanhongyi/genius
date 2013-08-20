@@ -1,7 +1,6 @@
 #coding:utf-8
 
 import os
-from subprocess import check_call
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -28,7 +27,7 @@ setup(
     long_description=README + '\n\n' + CHANGES,
     install_requires=requires,
     dependency_links=[
-        'git+https://github.com/duanhongyi/python-wapiti.git#egg=wapiti',
+        'git+https://github.com/duanhongyi/python-wapiti.git#egg=wapiti-1.0',
     ],
     platforms='all platform',
     license='BSD',
