@@ -1,4 +1,4 @@
 include README.md
 include MANIFEST.in
 include CHANGES.txt
-recursive-include genius/library/library.zip
+include genius/library/library.zip
