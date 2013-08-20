@@ -29,6 +29,7 @@ Algorithm
 * genius.seg_text函数接受5个参数: 1) 第一个参数为需要分词的字符 2) use_break代表对分词结构进行打断处理 3) use_combine代表是否使用字典进行词合并 4) use_tagging代表是否进行词性标注 5) use_pinyin_segment代表是否对拼音进行分词处理
 
 代码示例( 全功能分词 )
+
     #encoding=utf-8
     import genius
 
