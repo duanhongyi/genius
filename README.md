@@ -14,7 +14,8 @@ Feature
 Install
 ==========
 * 安装git: 1) ubuntu or debian `apt-get install git` 2) fedora or redhat `yum install git`
-* 升级pip和setuptools执行命令: `pip install easy_install` 和 `pip install pip --upgrade`
+* 升级setuptools: `pip install easy_install --upgrade`
+* 升级pip: `pip install pip --upgrade`
 * pip install https://github.com/duanhongyi/genius/archive/master.zip
 * 通过import genius来引用
 
