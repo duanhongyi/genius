@@ -33,5 +33,9 @@ Algorithm
     #encoding=utf-8
     import genius
 
-    seg_list = genius.seg_text(u'中国人民站起来了pinyin',use_combine=True,use_pinyin_segment=True,use_tagging=True)
+    seg_list = genius.seg_text(
+        u'中国人民站起来了pinyin',
+        use_combine=True,
+        use_pinyin_segment=True,
+        use_tagging=True)
     print '\n'.join(seg_list)
