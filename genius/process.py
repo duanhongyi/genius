@@ -17,6 +17,8 @@ class SimpleSegmentProcess(object):
             mark = StringHelper.mark(group)
             if mark == 'ASCII':
                 pre_words.append(group)
+            elif mark == 'PUNC':
+                pre_words.append(group)
             else:
                 words = self.segment(group)
                 if words:
@@ -147,11 +149,13 @@ class TaggingProcess(object):
         label = self.tagging(words)
         result_words = []
         for word_label in filter(lambda x: x, label.split('\n')):
-            text, _, tagging = word_label.decode('utf-8').split('\t')
+            text, marker, tagging = word_label.decode('utf-8').split('\t')
             if StringHelper.is_number(text):
                 result_words.append('\t'.join((text, 'm')))
             elif StringHelper.is_letter(text):
                 result_words.append('\t'.join((text, 'en')))
+            elif marker == 'PUNC':
+                result_words.append('\t'.join((text, 'w')))
             else:
                 result_words.append('\t'.join((text, tagging)))
         return result_words

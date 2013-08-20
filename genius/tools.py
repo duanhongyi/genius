@@ -12,7 +12,7 @@ class StringHelper(object):
     )
     whitespace_pattern = u"[%s]+[*?]*" % string.whitespace
     group_ascii_cjk_pattern = u'|'.join(
-        [ascii_pattern, punctuation_pattern, cjk_pattern, whitespace_pattern])
+        [ascii_pattern, punctuation_pattern, cjk_pattern])
     group_ascii_cjk = re.compile(group_ascii_cjk_pattern, re.UNICODE).findall
     is_whitespace_string = re.compile("^%s$" % whitespace_pattern).match
     is_number = re.compile('^[0-9]+[*?]*$').match
