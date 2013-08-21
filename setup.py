@@ -25,6 +25,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     long_description=README + '\n\n' + CHANGES,
+    url='https://github.com/duanhongyi/genius',
     install_requires=requires,
     dependency_links=[
         'git+https://github.com/duanhongyi/python-wapiti.git#egg=wapiti-1.0',
