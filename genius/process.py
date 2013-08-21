@@ -86,18 +86,6 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
                         pre_words.extend(group)
         return pre_words
 
-    def dict_keywords(self, text):
-        pos, length = 0, len(text)
-        pre_words = set()
-        while pos < length:
-            dic = self.trie.search(''.join(text[pos:length]))
-            for i in range(pos + 1, length + 1):
-                pre_word = text[pos:i]
-                if pre_word in dic and len(pre_word) > 1:
-                    pre_words.add(pre_word)
-            pos += 1
-        return pre_words
-
 
 class PinyinSegmentProcess(object):
 
