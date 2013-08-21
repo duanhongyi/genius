@@ -47,3 +47,16 @@ Algorithm
         use_pinyin_segment=True,
         use_tagging=True)
     print '\n'.join(seg_list)
+
+功能 2)：分词`genius.seg_keywords`方法
+==============
+* `genius.seg_keywords`方法专门为搜索引擎索引准备，保留歧义分割。
+* `genius.seg_keywords`接受仅需要一个参数，内容是需要分割的字符串
+
+代码示例( 全功能分词 )
+
+    #encoding=utf-8
+    import genius
+
+    seg_list = genius.seg_keywords(u'中国人民站起来了pinyin')
+    print '\n'.join(seg_list)
