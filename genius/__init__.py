@@ -31,11 +31,16 @@ def seg_text(text, **kwargs):
     """
     pre_words = processes['default']().process(text)
     if kwargs.get('use_break', False):  # 对分词结构进行打断
-        pre_words = processes['use_break']().process(pre_words)
+        pre_words = processes['break']().process(pre_words)
     if kwargs.get('use_combine', False):  # 合并分词结果
-        pre_words = processes['use_combine']().process(pre_words)
+        pre_words = processes['combine']().process(pre_words)
     if kwargs.get('use_pinyin_segment', False):  # 是否对pinyin分词
-        pre_words = processes['use_pinyin_segment']().process(pre_words)
+        pre_words = processes['pinyin_segment']().process(pre_words)
     if kwargs.get('use_tagging', False):  # 是否进行词性标注
-        pre_words = processes['use_tagging']().process(pre_words)
+        pre_words = processes['tagging']().process(pre_words)
+    return pre_words
+
+
+def seg_keywords(text):
+    pre_words = processes['segment_keywords']().process(text)
     return pre_words

@@ -20,16 +20,22 @@ class SimpleSegmentProcess(object):
             elif mark == 'PUNC':
                 pre_words.append(group)
             else:
-                words = self.segment(group)
+                label = self.label_sequence(group)
+                words = self.segment(label)
                 if words:
                     pre_words.extend(words)
                 else:
                     pre_words.extend(group)
         return pre_words
 
-    def segment(self, words):
+    def label_sequence(self, words, nbest=1):
+        self.seg_model.options.nbest = nbest
         label = self.seg_model.label_sequence(
             '\n'.join(words), include_input=True).decode('utf-8')
+        return label
+
+    @classmethod
+    def segment(cls, label):
         result_words = []
         prev_words = []
         for word_label in filter(lambda x: x.strip('\n'), label.split('\n')):
@@ -48,11 +54,56 @@ class SimpleSegmentProcess(object):
         return result_words
 
 
+class KeywordsSegmentProcess(SimpleSegmentProcess):
+
+    def __init__(self):
+        SimpleSegmentProcess.__init__(self)
+        self.trie = self.loader.load_trie_tree()
+
+    def process(self, text):
+        length = len(text)
+        if length <= 3:
+            return self.crf_keywords(text, nbest=1)
+        else:
+            return self.crf_keywords(text, 2)
+
+    def crf_keywords(self, text, nbest=2):
+        groups = StringHelper.group_ascii_cjk(text)
+        pre_words = []
+        for group in groups:
+            mark = StringHelper.mark(group)
+            if mark == 'ASCII':
+                pre_words.append(group)
+            elif mark == 'PUNC':
+                pre_words.append(group)
+            else:
+                labels = self.label_sequence(group, nbest)
+                for label in labels.split('\n\n'):
+                    words = self.segment(label)
+                    if words:
+                        pre_words.extend(words)
+                    else:
+                        pre_words.extend(group)
+        return pre_words
+
+    def dict_keywords(self, text):
+        pos, length = 0, len(text)
+        pre_words = set()
+        while pos < length:
+            dic = self.trie.search(''.join(text[pos:length]))
+            for i in range(pos + 1, length + 1):
+                pre_word = text[pos:i]
+                if pre_word in dic and len(pre_word) > 1:
+                    pre_words.add(pre_word)
+            pos += 1
+        return pre_words
+
+
 class PinyinSegmentProcess(object):
 
     def __init__(self):
-        self.resource = ResourceLoader()
-        self.trie = self.resource.load_trie_tree()
+        self.loader = ResourceLoader()
+        self.trie = self.loader.load_trie_tree()
 
     def process(self, words):
         pre_words = []
@@ -136,7 +187,8 @@ class TaggingProcess(object):
         self.loader = ResourceLoader()
         self.tagging_model = self.loader.load_crf_pos_model()
 
-    def tagging(self, words):
+    def label_sequence(self, words, nbest=1):
+        self.seg_model.options.nbest = nbest
         label_text = self.tagging_model.label_sequence(
             ''.join([(
                 '%s\t%s\n' % (word, StringHelper.mark(word))) for word in words
@@ -146,7 +198,11 @@ class TaggingProcess(object):
         return label_text
 
     def process(self, words):
-        label = self.tagging(words)
+        label = self.label_sequence(words, nbest=1)
+        return self.tagging(label)
+
+    @classmethod
+    def tagging(cls, label):
         result_words = []
         for word_label in filter(lambda x: x, label.split('\n')):
             text, marker, tagging = word_label.decode('utf-8').split('\t')
@@ -163,8 +219,9 @@ class TaggingProcess(object):
 
 processes = {
     'default': SimpleSegmentProcess,
-    'use_break': BreakProcess,
-    'use_combine': CombineProcess,
-    'use_tagging': TaggingProcess,
-    'use_pinyin_segment': PinyinSegmentProcess,
+    'break': BreakProcess,
+    'combine': CombineProcess,
+    'tagging': TaggingProcess,
+    'pinyin_segment': PinyinSegmentProcess,
+    'segment_keywords': KeywordsSegmentProcess,
 }
