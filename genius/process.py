@@ -1,4 +1,5 @@
 #encoding:utf-8
+from .trie import TrieTree
 from .loader import ResourceLoader
 from .tools import StringHelper
 from .digital import is_chinese_number, chinese_to_number
@@ -77,13 +78,29 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
             elif mark == 'PUNC':
                 pre_words.append(group)
             else:
-                labels = self.label_sequence(group, nbest)
-                for label in labels.split('\n\n'):
-                    words = self.segment(label)
-                    if words:
-                        pre_words.extend(words)
-                    else:
-                        pre_words.extend(group)
+                labels = self.label_sequence(group, nbest).split('\n\n')
+                words_list = filter(
+                    lambda x: x, [self.segment(label) for label in labels])
+                if words_list:
+                    pre_words.extend(self.merge_keywords(group, words_list))
+                else:
+                    pre_words.extend(group)
+        return pre_words
+
+    @classmethod
+    def merge_keywords(cls, text, words_list):
+        trie = TrieTree()
+        for words in words_list:
+            trie.add_all(words)
+        pos, length = 0, len(text)
+        pre_words = []
+        while pos < length:
+            dic = trie.search(text[pos:])
+            for i in range(pos + 1, length + 1):
+                word = text[pos:i]
+                if word in dic:
+                    pre_words.append(word)
+            pos += 1
         return pre_words
 
 

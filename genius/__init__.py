@@ -41,6 +41,18 @@ def seg_text(text, **kwargs):
     return pre_words
 
 
-def seg_keywords(text):
+def seg_keywords(text, **kwargs):
+    """
+    text: 必须是unicode
+    use_break: boolean类型，代表是否进行打断处理
+    use_tagging: boolean类型，是否进行词性标注
+    use_parse_pinyin: boolean类型，是否对拼音进行分词
+    """
     pre_words = processes['segment_keywords']().process(text)
+    if kwargs.get('use_break', False):  # 对分词结构进行打断
+        pre_words = processes['break']().process(pre_words)
+    if kwargs.get('use_pinyin_segment', False):  # 是否对pinyin分词
+        pre_words = processes['pinyin_segment']().process(pre_words)
+    if kwargs.get('use_tagging', False):  # 是否进行词性标注
+        pre_words = processes['tagging']().process(pre_words)
     return pre_words

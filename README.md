@@ -48,12 +48,16 @@ Algorithm
         use_tagging=True)
     print '\n'.join(seg_list)
 
-功能 2)：分词`genius.seg_keywords`方法
+功能 2)：面向索引分词
 ==============
 * `genius.seg_keywords`方法专门为搜索引擎索引准备，保留歧义分割。
-* `genius.seg_keywords`接受仅需要一个参数，内容是需要分割的字符串
+* `text`第一个参数为需要分词的字符 
+* `use_break`代表对分词结构进行打断处理 
+* `use_tagging`代表是否进行词性标注
+* `use_pinyin_segment`代表是否对拼音进行分词处理
+* 由于合并操作与此方法有意义上的冲突，此方法并不提供合并功能；并且如果采用此方法做索引时候，检索时不推荐`genius.seg_text`使用`use_combine=True`参数。
 
-代码示例( 全功能分词 )
+代码示例
 
     #encoding=utf-8
     import genius

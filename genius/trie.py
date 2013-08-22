@@ -38,10 +38,14 @@ class TrieTree(object):
 
     def __init__(self):
         self.root = self.TreeNode()
+    
+    def add_all(self, words):
+        for word in words:
+            self.add(word)
 
     def add(self, word):
         node = self.root
-        key = word.text
+        key = word.text if isinstance(word, Word) else word
         for char in key:
             if char not in node.children:
                 child = self.TreeNode()
