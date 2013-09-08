@@ -1,45 +1,72 @@
 #encoding:utf-8
 import re
-import string
+#from genius.word import Word
 
 
 class StringHelper(object):
 
-    cjk_pattern = u'[\u4e00-\u9fff\u3400-\u4ddf\u9000-\ufaff\u3040-\u309f\uac00-\ud7af\uff10-\uff19]+[*?]*'
-    ascii_pattern = u'[a-zA-Z]+[*?]*|[0-9]+[*?]*'
-    punctuation_pattern = (
-        u'[%s！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝～]+[*?]*' % string.punctuation
+    #range
+    num_range = u'0-9'
+    letter_range = u'a-zA-Z'
+    cjk_range = u'\u4e00-\u9fff\u3400-\u4ddf\u9000-\ufaff'
+    cjk_range += u'\u3040-\u309f\uac00-\ud7af\uff10-\uff19'
+    whitespace_range = u'\t\n\x0b\x0c\r '
+    half_width_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+    full_width_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝～'
+
+    num_pattern = u'[%s]' % num_range
+    letter_pattern = u'[%s]' % letter_range
+    cjk_pattern = u'[%s]' % cjk_range
+    whitespace_pattern = u'[%s]' % whitespace_range
+    half_width_punctuation_pattern = u'[%s]' % half_width_punctuation_range
+    full_width_punctuation_pattern = u'[%s]' % full_width_punctuation_range
+    unknown_pattern = u'[^%s]' % (
+        ''.join([
+            num_range,
+            letter_range,
+            cjk_range,
+            whitespace_range,
+            half_width_punctuation_range,
+            full_width_punctuation_range,
+        ])
     )
-    whitespace_pattern = u"[%s]+[*?]*" % string.whitespace
-    group_ascii_cjk_pattern = u'|'.join(
-        [ascii_pattern, punctuation_pattern, cjk_pattern])
-    group_ascii_cjk = re.compile(group_ascii_cjk_pattern, re.UNICODE).findall
-    is_whitespace_string = re.compile("^%s$" % whitespace_pattern).match
-    is_number = re.compile('^[0-9]+[*?]*$').match
-    is_letter = re.compile('^[a-zA-Z]+[*?]*$').match
 
-    #判断字符是否是cjk字符
-    @staticmethod
-    def is_cjk_char(charater):
-        c = ord(charater)
-        return 0x4E00 <= c <= 0x9FFF or \
-            0x3400 <= c <= 0x4dbf or \
-            0xf900 <= c <= 0xfaff or \
-            0x3040 <= c <= 0x309f or \
-            0xac00 <= c <= 0xd7af or \
-            0xFF10 <= c <= 0xFF19
+    group_marker = re.compile(
+        '|'.join(map(lambda x:'%s+[*?]*' % x, [
+            num_pattern,
+            letter_pattern,
+            cjk_pattern,
+            whitespace_pattern,
+            half_width_punctuation_pattern,
+            full_width_punctuation_pattern,
+            unknown_pattern,
+        ]))
+    ).findall
 
-    #判断是否是ASCII码
-    @staticmethod
-    def is_latin_char(ch):
-        if ch in string.whitespace:
-            return False
-        if ch in string.punctuation:
-            return False
-        return ch in string.printable
+    #单词分类标记
+    @classmethod
+    def mark_text(cls, word):
+        marker = None
+        if re.match('^%s+[*?]*$' % cls.num_pattern, word):  # 数字
+            marker = 'NUM'
+        elif re.match('^%s+[*?]*$' % cls.letter_pattern, word):  # 字母
+            marker = 'LETTER'
+        elif re.match('^%s+[*?]*$' % cls.cjk_pattern, word):  # 中文
+            marker = 'CN'
+        elif re.match('^%s+[*?]*$' % cls.whitespace_pattern, word):  # 空格字符
+            marker = 'WHITESPACE'
+        elif re.match(
+                '^%s+[*?]*$' % cls.half_width_punctuation_pattern, word):  # 半角符号
+            marker = 'HPUNC'
+        elif re.match(
+                '^%s+[*?]*$' % cls.full_width_punctuation_pattern, word):  # 全角符号
+            marker = 'FPUNC'
+        else:
+            marker = 'UNKNOWN'  # 未知标记
+        return marker
 
-    @staticmethod
-    def halfwidth_to_fullwidth(word):
+    @classmethod
+    def halfwidth_to_fullwidth(cls, word):
         rstring = ""
         for uchar in word:
             inside_code = ord(uchar)
@@ -53,8 +80,8 @@ class StringHelper(object):
             rstring += unichr(inside_code)
         return rstring
 
-    @staticmethod
-    def fullwidth_to_halfwidth(word):
+    @classmethod
+    def fullwidth_to_halfwidth(cls, word):
         rstring = ""
         for uchar in word:
             inside_code = ord(uchar)
@@ -67,13 +94,3 @@ class StringHelper(object):
             else:
                 rstring += unichr(inside_code)
         return rstring
-
-    #单词分类标记
-    @staticmethod
-    def mark(word):
-        if re.match('^%s$' % StringHelper.ascii_pattern, word):
-            return 'ASCII'
-        elif re.match('^%s$' % StringHelper.cjk_pattern, word):
-            return 'CN'
-        else:
-            return 'PUNC'

@@ -1,21 +1,25 @@
 #encoding:utf-8
 import os
 import zipfile
+from contextlib import closing
 from .process import processes
+from .word import Word
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def init_library():
     zfile_path = os.path.join(here, 'library/library.zip')
-    if not os.path.exists(os.path.join(here, 'library/user_library/')):
-        zfile = zipfile.ZipFile(zfile_path, 'r')
-        for filename in zfile.namelist():
-            if filename.endswith('/'):
-                os.mkdir(os.path.join(here, 'library/%s' % filename))
-            else:
-                data = zfile.read(filename)
-                f = open(os.path.join(here, 'library/%s' % filename), 'w+b')
+    zfile = zipfile.ZipFile(zfile_path, 'r')
+    for filename in zfile.namelist():
+        file_path = os.path.join(here, 'library/%s' % filename)
+        if not os.path.exists(file_path):
+            continue
+        if filename.endswith('/'):
+            os.mkdir(file_path)
+        else:
+            data = zfile.read(filename)
+            with closing(open(file_path, 'w+b')) as f:
                 f.write(data)
                 f.close()
 init_library()
@@ -29,7 +33,8 @@ def seg_text(text, **kwargs):
     use_tagging: boolean类型，是否进行词性标注
     use_parse_pinyin: boolean类型，是否对拼音进行分词
     """
-    pre_words = processes['default']().process(text)
+    word = Word(text)
+    pre_words = processes['default']().process(word)
     if kwargs.get('use_break', False):  # 对分词结构进行打断
         pre_words = processes['break']().process(pre_words)
     if kwargs.get('use_combine', False):  # 合并分词结果
@@ -48,7 +53,8 @@ def seg_keywords(text, **kwargs):
     use_tagging: boolean类型，是否进行词性标注
     use_parse_pinyin: boolean类型，是否对拼音进行分词
     """
-    pre_words = processes['segment_keywords']().process(text)
+    word = Word(text)
+    pre_words = processes['segment_keywords']().process(word)
     if kwargs.get('use_break', False):  # 对分词结构进行打断
         pre_words = processes['break']().process(pre_words)
     if kwargs.get('use_pinyin_segment', False):  # 是否对pinyin分词

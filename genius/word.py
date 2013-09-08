@@ -11,15 +11,12 @@ class Word(object):
         self.tagging = kwargs.get('tagging', 'unknown')  # 词性
         self.source = kwargs.get('source', 'unknown')  # dic:字典,crf:crf生成,brk:打断字典
         self.offset = kwargs.get('offset', 0)  # 在文本中的位置
-        #标记（NUM、LETTER、CN、HWPUNC、FWPUNC、UNKNOW）
+        #see string_helper.mark_text method
         self.marker = kwargs.get(
-            'marker', self.string_helper.marker_text(self.text))
-
-    def __repr__(self):
-        return "u'%s'" % self.text.encode('unicode_escape')
+            'marker', self.string_helper.mark_text(self.text))
 
     def __str__(self):
-        return self.text
+        return self.text.encode('utf8')
 
     def __len__(self):
         return len(self.text)

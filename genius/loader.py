@@ -94,7 +94,7 @@ class ResourceLoader(object):
                 return
             with open(break_idx) as break_file:
                 for line in break_file:
-                    label = unicode(line, "utf-8").strip().split('\t')
+                    label = line.decode("utf-8").strip().split('\t')
                     tree[label[0]] = label[1:]
             self._break_table = tree
         return self._break_table
