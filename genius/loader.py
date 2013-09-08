@@ -78,6 +78,7 @@ class ResourceLoader(object):
                             word,
                             freq=freq,
                             tagging=tagging,
+                            source = 'dic',
                         ))
             self._trie_tree = trie_tree
         return self._trie_tree
