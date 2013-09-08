@@ -46,7 +46,7 @@ Algorithm
         use_combine=True,
         use_pinyin_segment=True,
         use_tagging=True)
-    print '\n'.join(seg_list)
+    print '\n'.join(['%s\t%s' % (word.text, word.tagging) for word in seg_list])
 
 功能 2)：面向索引分词
 ==============
@@ -63,4 +63,4 @@ Algorithm
     import genius
 
     seg_list = genius.seg_keywords(u'中国人民站起来了pinyin')
-    print '\n'.join(seg_list)
+    print '\n'.join([word.text for word in seg_list])
