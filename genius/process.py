@@ -192,8 +192,7 @@ class TaggingProcess(object):
         self.loader = ResourceLoader()
         self.tagging_model = self.loader.load_crf_pos_model()
 
-    def label_sequence(self, words, nbest=1):
-        self.seg_model.options.nbest = nbest
+    def label_sequence(self, words):
         label_text = self.tagging_model.label_sequence(
             ''.join([(
                 '%s\t%s\n' % (word, StringHelper.mark(word))) for word in words
@@ -203,7 +202,7 @@ class TaggingProcess(object):
         return label_text
 
     def process(self, words):
-        label = self.label_sequence(words, nbest=1)
+        label = self.label_sequence(words)
         return self.tagging(label)
 
     @classmethod
