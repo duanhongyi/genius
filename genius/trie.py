@@ -1,69 +1,51 @@
 #encoding:utf-8
 from __future__ import unicode_literals
-from .tools import StringHelper
 
 
-class Word(object):
+class TreeNode(object):
 
-    def __init__(self, text, **kwargs):
-        self.text = text
-        self.freq = kwargs.get('freq', 0)
-        self.tagging = kwargs.get('tagging', 'unknow')
-        self.weight = kwargs.get('weight', 0)
-        self.source = kwargs.get('source', 'system')
-        self.marker = StringHelper.mark(text)
-
-    def __repr__(self):
-        return "u'%s'" % self.text.encode('unicode_escape')
-
-    def __len__(self):
-        return len(self.text)
-
-    def __hash__(self):
-        return self.text.__hash__()
-
-    def __eq__(self, obj):
-        if isinstance(obj, Word):
-            return self.text == obj.text
-        return obj == self.text
+    def __init__(self):
+        self.key = None
+        self.value = None
+        self.children = {}
 
 
 class TrieTree(object):
 
-    class TreeNode(object):
-
-        def __init__(self):
-            self.value = None
-            self.children = {}
-
     def __init__(self):
-        self.root = self.TreeNode()
-    
-    def add_all(self, words):
-        for word in words:
-            self.add(word)
+        self.root = TreeNode()
 
-    def add(self, word):
+    def __setitem__(self, key, value):
+        self.add(key, value)
+
+    def __getitem__(self, key):
+        cache = self.search(key)
+        return cache[key]
+
+    def get(self, key):
+        cache = self.search(key)
+        return cache.get(key)
+
+    def add(self, key, value):
         node = self.root
-        key = word.text if isinstance(word, Word) else word
         for char in key:
             if char not in node.children:
-                child = self.TreeNode()
-                child.value = word
+                child = TreeNode()
+                child.key = key
+                child.value = value
                 node.children[char] = child
                 node = child
             else:
                 node = node.children[char]
-        node.value = word
+        node.value = value
 
     def search(self, key):
         '''return all partially matched strings with the input key'''
         node = self.root
-        matches = set()
+        matches = {}
         for char in key:
             if char not in node.children:
                 break
             node = node.children[char]
-            if node.value:
-                matches.add(node.value)
+            matches[node.key] = node.value
         return matches

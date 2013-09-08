@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 
 import os
 from wapiti import Model
-from genius.trie import TrieTree, Word
+from genius.trie import TrieTree
+from genius.word import Word
 
 here = os.path.abspath(os.path.dirname(__file__))
 library_path = os.path.join(here, 'library')
@@ -65,7 +66,6 @@ class ResourceLoader(object):
             trie_tree = TrieTree()
             if not path:
                 path = library_path
-            user_path = os.path.join(path, 'user_library')
             for node_path in os.listdir(path):
                 if not node_path.endswith('.dic'):
                     continue
@@ -74,24 +74,10 @@ class ResourceLoader(object):
                     for line in f:
                         word, tagging, freq = line.decode(
                             'utf-8').strip().split('\t')
-                        trie_tree.add(Word(
+                        trie_tree.add(word, Word(
                             word,
                             freq=freq,
                             tagging=tagging,
-                        ))
-            for node_path in os.listdir(user_path):
-                if not node_path.endswith('.dic'):
-                    continue
-                node_path = os.sep.join([user_path, node_path])
-                with open(node_path) as f:
-                    for line in f:
-                        word, tagging, freq = line.decode(
-                            'utf-8').strip().split('\t')
-                        trie_tree.add(Word(
-                            word,
-                            freq=freq,
-                            tagging=tagging,
-                            source="user"
                         ))
             self._trie_tree = trie_tree
         return self._trie_tree
