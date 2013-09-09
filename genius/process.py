@@ -26,7 +26,6 @@ class MarkerSegmentProcess(object):
     def process(self, word):
         """
         将文本切割成以marker为单位的词
-        仅保留（字符、数字、标点、中文）
         """
         groups = self.string_helper.group_marker(word.text)
         return self.split_by_groups(word, groups)
