@@ -34,15 +34,15 @@ def seg_text(text, **kwargs):
     use_parse_pinyin: boolean类型，是否对拼音进行分词
     """
     word = Word(text)
-    pre_words = processes['default']().process(word)
+    pre_words = processes['default'](**kwargs).process(word)
     if kwargs.get('use_break', False):  # 对分词结构进行打断
-        pre_words = processes['break']().process(pre_words)
+        pre_words = processes['break'](**kwargs).process(pre_words)
     if kwargs.get('use_combine', False):  # 合并分词结果
-        pre_words = processes['combine']().process(pre_words)
+        pre_words = processes['combine'](**kwargs).process(pre_words)
     if kwargs.get('use_pinyin_segment', False):  # 是否对pinyin分词
-        pre_words = processes['pinyin_segment']().process(pre_words)
+        pre_words = processes['pinyin_segment'](**kwargs).process(pre_words)
     if kwargs.get('use_tagging', False):  # 是否进行词性标注
-        pre_words = processes['tagging']().process(pre_words)
+        pre_words = processes['tagging'](**kwargs).process(pre_words)
     return pre_words
 
 
@@ -54,11 +54,11 @@ def seg_keywords(text, **kwargs):
     use_parse_pinyin: boolean类型，是否对拼音进行分词
     """
     word = Word(text)
-    pre_words = processes['segment_keywords']().process(word)
+    pre_words = processes['segment_keywords'](**kwargs).process(word)
     if kwargs.get('use_break', False):  # 对分词结构进行打断
-        pre_words = processes['break']().process(pre_words)
+        pre_words = processes['break'](**kwargs).process(pre_words)
     if kwargs.get('use_pinyin_segment', False):  # 是否对pinyin分词
-        pre_words = processes['pinyin_segment']().process(pre_words)
+        pre_words = processes['pinyin_segment'](**kwargs).process(pre_words)
     if kwargs.get('use_tagging', False):  # 是否进行词性标注
-        pre_words = processes['tagging']().process(pre_words)
+        pre_words = processes['tagging'](**kwargs).process(pre_words)
     return pre_words

@@ -1,66 +1,51 @@
 #encoding:utf-8
 import re
-#from genius.word import Word
 
 
 class StringHelper(object):
 
     #range
-    num_range = u'0-9'
-    letter_range = u'a-zA-Z'
-    cjk_range = u'\u4e00-\u9fff\u3400-\u4ddf\u9000-\ufaff'
-    cjk_range += u'\u3040-\u309f\uac00-\ud7af\uff10-\uff19'
+    digit_range = u'0-9'
+    alpha_range = u'a-zA-Z'
     whitespace_range = u'\t\n\x0b\x0c\r '
-    half_width_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    full_width_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝～'
+    punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+    punctuation_range += u'！＂＃＄％＆＇（）＊＋，－．／：；'
+    punctuation_range += u'＜＝＞？＠［＼］＾＿｀｛｜｝～。、《》•'
 
-    num_pattern = u'[%s]' % num_range
-    letter_pattern = u'[%s]' % letter_range
-    cjk_pattern = u'[%s]' % cjk_range
+    digit_pattern = u'[%s]' % digit_range
+    alpha_pattern = u'[%s]' % alpha_range
     whitespace_pattern = u'[%s]' % whitespace_range
-    half_width_punctuation_pattern = u'[%s]' % half_width_punctuation_range
-    full_width_punctuation_pattern = u'[%s]' % full_width_punctuation_range
-    unknown_pattern = u'[^%s]' % (
-        ''.join([
-            num_range,
-            letter_range,
-            cjk_range,
-            whitespace_range,
-            half_width_punctuation_range,
-            full_width_punctuation_range,
-        ])
-    )
+    punctuation_pattern = u'[%s]' % punctuation_range
+    unknown_pattern = u'[^%s]' % ''.join([
+        digit_range,
+        alpha_range,
+        whitespace_range,
+        punctuation_range,
+    ])
 
     group_marker = re.compile(
-        '|'.join(map(lambda x:'%s+[*?]*' % x, [
-            num_pattern,
-            letter_pattern,
-            cjk_pattern,
+        '|'.join(map(lambda x: '%s+[*?]*' % x, [
+            digit_pattern,
+            alpha_pattern,
             whitespace_pattern,
-            half_width_punctuation_pattern,
-            full_width_punctuation_pattern,
+            punctuation_pattern,
             unknown_pattern,
         ]))
     ).findall
 
     #单词分类标记
     @classmethod
-    def mark_text(cls, word):
+    def mark_text(cls, text):
         marker = None
-        if re.match('^%s+[*?]*$' % cls.num_pattern, word):  # 数字
-            marker = 'NUM'
-        elif re.match('^%s+[*?]*$' % cls.letter_pattern, word):  # 字母
-            marker = 'LETTER'
-        elif re.match('^%s+[*?]*$' % cls.cjk_pattern, word):  # 中文
-            marker = 'CN'
-        elif re.match('^%s+[*?]*$' % cls.whitespace_pattern, word):  # 空格字符
+        if re.match('^%s+[*?]*$' % cls.digit_pattern, text):  # 数字
+            marker = 'DIGIT'
+        elif re.match('^%s+[*?]*$' % cls.alpha_pattern, text):  # 字母
+            marker = 'ALPHA'
+        elif re.match('^%s+[*?]*$' % cls.whitespace_pattern, text):  # 空格字符
             marker = 'WHITESPACE'
         elif re.match(
-                '^%s+[*?]*$' % cls.half_width_punctuation_pattern, word):  # 半角符号
-            marker = 'HPUNC'
-        elif re.match(
-                '^%s+[*?]*$' % cls.full_width_punctuation_pattern, word):  # 全角符号
-            marker = 'FPUNC'
+                '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 半角符号
+            marker = 'PUNC'
         else:
             marker = 'UNKNOWN'  # 未知标记
         return marker

@@ -5,8 +5,7 @@ from __future__ import unicode_literals
 class TreeNode(object):
 
     def __init__(self):
-        self.key = None
-        self.value = None
+        self.value = {}
         self.children = {}
 
 
@@ -31,13 +30,11 @@ class TrieTree(object):
         for char in key:
             if char not in node.children:
                 child = TreeNode()
-                child.key = key
-                child.value = value
                 node.children[char] = child
                 node = child
             else:
                 node = node.children[char]
-        node.value = value
+        node.value[key] = value
 
     def search(self, key):
         '''return all partially matched strings with the input key'''
@@ -47,5 +44,5 @@ class TrieTree(object):
             if char not in node.children:
                 break
             node = node.children[char]
-            matches[node.key] = node.value
+            matches.update(node.value)
         return matches
