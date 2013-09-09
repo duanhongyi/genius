@@ -8,19 +8,23 @@ class StringHelper(object):
     digit_range = u'0-9'
     alpha_range = u'a-zA-Z'
     whitespace_range = u'\t\n\x0b\x0c\r '
-    punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    punctuation_range += u'！＂＃＄％＆＇（）＊＋，－．／：；'
-    punctuation_range += u'＜＝＞？＠［＼］＾＿｀｛｜｝～。、《》•'
+    halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+    fullwidth_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；'
+    fullwidth_punctuation_range += u'＜＝＞？＠［＼］＾＿｀｛｜｝～。、《》•'
 
     digit_pattern = u'[%s]' % digit_range
     alpha_pattern = u'[%s]' % alpha_range
     whitespace_pattern = u'[%s]' % whitespace_range
-    punctuation_pattern = u'[%s]' % punctuation_range
-    unknown_pattern = u'[^%s]' % ''.join([
+    halfwidth_punctuation_pattern = u'[%s]' % halfwidth_punctuation_range
+    punctuation_pattern = u'[%s]' % ''.join([
+        halfwidth_punctuation_range,
+        fullwidth_punctuation_range,
+    ])
+    cjk_pattern = u'[^%s]' % ''.join([
         digit_range,
         alpha_range,
         whitespace_range,
-        punctuation_range,
+        halfwidth_punctuation_range,
     ])
 
     group_marker = re.compile(
@@ -28,8 +32,8 @@ class StringHelper(object):
             digit_pattern,
             alpha_pattern,
             whitespace_pattern,
-            punctuation_pattern,
-            unknown_pattern,
+            halfwidth_punctuation_pattern,
+            cjk_pattern,
         ]))
     ).findall
 
@@ -47,7 +51,7 @@ class StringHelper(object):
                 '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 半角符号
             marker = 'PUNC'
         else:
-            marker = 'UNKNOWN'  # 未知标记
+            marker = 'CJK'  # 中日韩
         return marker
 
     @classmethod

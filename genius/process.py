@@ -11,25 +11,6 @@ class MarkerSegmentProcess(object):
     def __init__(self, **kwargs):
         self.string_helper = StringHelper()
 
-    def combine_ascii(self, words):
-        pos = 0
-        length = len(words)
-        pre_words = []
-        while pos < length - 1:
-            max_matching_pos = 0
-            for i in range(pos + 1, length + 1):
-                text = ''.join(map(lambda x: x.text, words[pos:i]))
-                if self.string_helper.mark_text(text) in ['DIGIT', 'ALPHA']:
-                    max_matching_pos = i
-            if max_matching_pos == 0:
-                max_matching_pos = pos + 1
-            text = ''.join(map(lambda x: x.text, words[pos:max_matching_pos]))
-            word = Word(text)
-            word.offset = pos
-            pre_words.append(word)
-            pos = max_matching_pos
-        return pre_words
-
     @classmethod
     def split_by_groups(cls, word, groups):
         length = len(groups)
@@ -57,20 +38,17 @@ class SimpleSegmentProcess(MarkerSegmentProcess):
         MarkerSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.seg_model = self.loader.load_crf_seg_model()
-        self.use_combine_ascii = kwargs.get('use_combine_ascii', True)
 
     def process(self, word):
         words = MarkerSegmentProcess.process(self, word)
         pre_words = []
         for word in words:
-            if word.marker == 'WHITESPACE':
-                pre_words.append(word)
-            else:
+            if word.marker == 'CJK':
                 label = self.label_sequence(word.text)
                 groups = self.segment(label, word.text)
                 pre_words.extend(self.split_by_groups(word, groups))
-        if self.use_combine_ascii:
-            return self.combine_ascii(pre_words)
+            else:
+                pre_words.append(word)
         return pre_words
 
     def label_sequence(self, text, nbest=1):
@@ -78,23 +56,22 @@ class SimpleSegmentProcess(MarkerSegmentProcess):
             self.seg_model.options.nbest = nbest
         label = self.seg_model.label_sequence(
             '\n'.join(text), False).decode('utf-8')
-        return label
+        return label.strip(self.string_helper.whitespace_range)
 
     @classmethod
     def segment(cls, label, text):
         result_words = []
         offset = 0
-        for index, label in enumerate(
-                filter(lambda x: x.strip('\n'), label.split('\n'))):
+        for index, label in enumerate(label.split('\n')):
             if 'S' == label:
                 if index - offset > 1:
                     result_words.append(text[offset:index])
                 result_words.append(text[index])
                 offset = index + 1
             elif 'E' == label:
-                result_words.append(text[offset:index+1])
+                result_words.append(text[offset:index + 1])
                 offset = index + 1
-        if offset < len(text) + 1:
+        if offset < len(text):
             result_words.append(text[offset:])
         return result_words
 
@@ -111,26 +88,22 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
         else:
             return self.crf_keywords(word, 2)
 
-    def parse_label(self, word, label):
-        words = self.split_by_groups(word, self.segment(label, word.text))
-        if self.use_combine_ascii:
-            words = self.combine_ascii(words)
-        return words
-
     def crf_keywords(self, word, nbest=2):
         words = MarkerSegmentProcess.process(self, word)
         pre_words = []
         for word in words:
-            if word.marker == 'WHITESPACE':
-                pre_words.append(word)
-            else:
+            if word.marker == 'CJK':
                 labels = self.label_sequence(word.text, nbest).split('\n\n')
                 words_list = filter(
                     lambda x: x,
-                    [self.parse_label(word, label) for label in labels],
+                    [self.split_by_groups(
+                        word, self.segment(label, word.text)
+                    ) for label in labels],
                 )
                 pre_words.extend(
                     self.split_by_groups_keywords(word.text, words_list))
+            else:
+                pre_words.append(word)
         return pre_words
 
     @classmethod
@@ -219,7 +192,7 @@ class CombineProcess(MarkerSegmentProcess):
         pos = 0
         length = len(words)
         pre_words = []
-        while pos < length - 1:
+        while pos < length:
             max_matching_pos = 0
             dic = self.trie.search(''.join(
                 map(lambda x: x.text, words[pos:length])))
@@ -245,6 +218,7 @@ class CombineProcess(MarkerSegmentProcess):
 class TaggingProcess(object):
 
     def __init__(self, **kwargs):
+        self.string_helper = StringHelper()
         self.loader = ResourceLoader()
         self.tagging_model = self.loader.load_crf_pos_model()
 
@@ -262,8 +236,8 @@ class TaggingProcess(object):
         label_text = self.tagging_model.label_sequence(
             '\n'.join(label_sequence_texts),
             include_input=False,
-        )
-        taggings = filter(lambda x: x, label_text.split('\n'))
+        ).strip(self.string_helper.whitespace_range)
+        taggings = label_text.split('\n')
         map(lambda x: taggings.insert(x, 'x'), unlabel_sequence_indexes)
         return taggings
 

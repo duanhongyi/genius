@@ -35,7 +35,6 @@ Algorithm
 * `use_combine`代表是否使用字典进行词合并
 * `use_tagging`代表是否进行词性标注
 * `use_pinyin_segment`代表是否对拼音进行分词处理
-* `use_combine_ascii`代表合并ascii字符，默认启用
 
 代码示例( 全功能分词 )
 
@@ -56,7 +55,6 @@ Algorithm
 * `use_break`代表对分词结构进行打断处理 
 * `use_tagging`代表是否进行词性标注
 * `use_pinyin_segment`代表是否对拼音进行分词处理
-* `use_combine_ascii`代表合并ascii字符，默认启用
 * 由于合并操作与此方法有意义上的冲突，此方法并不提供合并功能；并且如果采用此方法做索引时候，检索时不推荐`genius.seg_text`使用`use_combine=True`参数。
 
 代码示例
