@@ -15,7 +15,7 @@ class MarkerSegmentProcess(object):
         pos = 0
         length = len(words)
         pre_words = []
-        while pos < length:
+        while pos < length - 1:
             max_matching_pos = 0
             for i in range(pos + 1, length + 1):
                 text = ''.join(map(lambda x: x.text, words[pos:i]))
@@ -219,7 +219,7 @@ class CombineProcess(MarkerSegmentProcess):
         pos = 0
         length = len(words)
         pre_words = []
-        while pos < length:
+        while pos < length - 1:
             max_matching_pos = 0
             dic = self.trie.search(''.join(
                 map(lambda x: x.text, words[pos:length])))
