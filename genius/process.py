@@ -6,7 +6,7 @@ from .word import Word
 from .digital import is_chinese_number, chinese_to_number
 
 
-class MarkerSegmentProcess(object):
+class BaseSegmentProcess(object):
 
     def __init__(self, **kwargs):
         self.string_helper = StringHelper()
@@ -31,16 +31,16 @@ class MarkerSegmentProcess(object):
         return self.split_by_groups(word, groups)
 
 
-class SimpleSegmentProcess(MarkerSegmentProcess):
+class SimpleSegmentProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
-        MarkerSegmentProcess.__init__(self, **kwargs)
+        BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.seg_model = self.loader.load_crf_seg_model()
         self.segment_type = 'crf'
 
     def process(self, word):
-        words = MarkerSegmentProcess.process(self, word)
+        words = BaseSegmentProcess.process(self, word)
         pre_words = []
         for word in words:
             if word.marker == 'CJK':
@@ -89,7 +89,7 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
             return self.crf_keywords(word, 2)
 
     def crf_keywords(self, word, nbest=2):
-        words = MarkerSegmentProcess.process(self, word)
+        words = BaseSegmentProcess.process(self, word)
         pre_words = []
         for word in words:
             if word.marker == 'CJK':
@@ -124,10 +124,10 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
         return pre_words
 
 
-class PinyinSegmentProcess(MarkerSegmentProcess):
+class PinyinSegmentProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
-        MarkerSegmentProcess.__init__(self, **kwargs)
+        BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.trie = self.loader.load_trie_tree()
         self.segment_type = 'pinyin'
@@ -165,10 +165,10 @@ class PinyinSegmentProcess(MarkerSegmentProcess):
         return pre_words
 
 
-class BreakProcess(MarkerSegmentProcess):
+class BreakProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
-        MarkerSegmentProcess.__init__(self, **kwargs)
+        BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.tree = self.loader.load_break_table()
         self.segment_type = 'break'
@@ -184,10 +184,10 @@ class BreakProcess(MarkerSegmentProcess):
         return break_word_result
 
 
-class CombineProcess(MarkerSegmentProcess):
+class CombineProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
-        MarkerSegmentProcess.__init__(self, **kwargs)
+        BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.trie = self.loader.load_trie_tree()
 
