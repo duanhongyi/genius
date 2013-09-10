@@ -10,15 +10,15 @@ class MarkerSegmentProcess(object):
 
     def __init__(self, **kwargs):
         self.string_helper = StringHelper()
+        self.segment_type = 'marker'
 
-    @classmethod
-    def split_by_groups(cls, word, groups):
+    def split_by_groups(self, word, groups):
         length = len(groups)
         offset = word.offset
         words = []
         for index in range(length):
             group = groups[index]
-            word = Word(group, offset=offset)
+            word = Word(group, offset=offset, source=self.segment_type)
             offset += len(group)
             words.append(word)
         return words
@@ -37,6 +37,7 @@ class SimpleSegmentProcess(MarkerSegmentProcess):
         MarkerSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.seg_model = self.loader.load_crf_seg_model()
+        self.segment_type = 'crf'
 
     def process(self, word):
         words = MarkerSegmentProcess.process(self, word)
@@ -129,6 +130,7 @@ class PinyinSegmentProcess(MarkerSegmentProcess):
         MarkerSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.trie = self.loader.load_trie_tree()
+        self.segment_type = 'pinyin'
 
     def process(self, words):
         pre_words = []
@@ -136,7 +138,8 @@ class PinyinSegmentProcess(MarkerSegmentProcess):
             if word.marker == 'ALPHA':
                 pinyins = self.segment(word.text)
                 if pinyins:
-                    pre_words.extend(self.split_by_groups(word, pinyins))
+                    pre_words.extend(self.split_by_groups(
+                        word, pinyins))
                 else:
                     pre_words.append(word)
             else:
@@ -168,6 +171,7 @@ class BreakProcess(MarkerSegmentProcess):
         MarkerSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.tree = self.loader.load_break_table()
+        self.segment_type = 'break'
 
     def process(self, words):
         break_word_result = []

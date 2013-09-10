@@ -9,8 +9,8 @@ class StringHelper(object):
     alpha_range = u'a-zA-Z'
     whitespace_range = u'\t\n\x0b\x0c\r '
     halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    fullwidth_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；'
-    fullwidth_punctuation_range += u'＜＝＞？＠［＼］＾＿｀｛｜｝～。、《》•'
+    fullwidth_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？'
+    fullwidth_punctuation_range += u'＠［＼］＾＿｀｛｜｝～。、《》•”“'
 
     digit_pattern = u'[%s]' % digit_range
     alpha_pattern = u'[%s]' % alpha_range
