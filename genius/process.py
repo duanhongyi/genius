@@ -1,4 +1,5 @@
 #encoding:utf-8
+import copy
 from .trie import TrieTree
 from .loader import ResourceLoader
 from .tools import StringHelper
@@ -165,7 +166,7 @@ class PinyinSegmentProcess(BaseSegmentProcess):
         return pre_words
 
 
-class BreakProcess(BaseSegmentProcess):
+class BreakSegmentProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
         BaseSegmentProcess.__init__(self, **kwargs)
@@ -184,7 +185,7 @@ class BreakProcess(BaseSegmentProcess):
         return break_word_result
 
 
-class CombineProcess(BaseSegmentProcess):
+class CombineSegmentProcess(BaseSegmentProcess):
 
     def __init__(self, **kwargs):
         BaseSegmentProcess.__init__(self, **kwargs)
@@ -208,11 +209,13 @@ class CombineProcess(BaseSegmentProcess):
             if max_matching_pos == 0:
                 max_matching_pos = pos + 1
             text = ''.join(map(lambda x: x.text, words[pos:max_matching_pos]))
+            word = words[pos]
             if text in dic:
-                word = dic[text]
+                pre_word = copy.copy(dic[text])
+                pre_word.offset = word.offset
+                word = pre_word
             else:
-                word = Word(text)
-            word.offset = pos
+                word = words[pos]
             pre_words.append(word)
             pos = max_matching_pos
         return pre_words
@@ -268,9 +271,9 @@ class TaggingProcess(object):
 
 processes = {
     'default': SimpleSegmentProcess,
-    'break': BreakProcess,
-    'combine': CombineProcess,
-    'tagging': TaggingProcess,
+    'break': BreakSegmentProcess,
+    'combine': CombineSegmentProcess,
     'pinyin_segment': PinyinSegmentProcess,
     'segment_keywords': KeywordsSegmentProcess,
+    'tagging': TaggingProcess,
 }
