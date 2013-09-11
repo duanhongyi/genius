@@ -42,7 +42,7 @@ Algorithm
     import genius
 
     seg_list = genius.seg_text(
-        u'中国人民站起来了pinyin',
+        u'我的英文名叫xiaoshenyang我是中国人民人均GDP消费不足5000.56元',
         use_combine=True,
         use_pinyin_segment=True,
         use_tagging=True)
@@ -62,5 +62,5 @@ Algorithm
     #encoding=utf-8
     import genius
 
-    seg_list = genius.seg_keywords(u'中国人民站起来了pinyin')
+    seg_list = genius.seg_keywords(u'南京市长江大桥')
     print '\n'.join([word.text for word in seg_list])
