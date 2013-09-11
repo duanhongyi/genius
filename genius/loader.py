@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import re
 import os
 from wapiti import Model
 from genius.trie import TrieTree
@@ -23,6 +24,7 @@ class ResourceLoader(object):
             cls._instance._crf_seg_model = None
             cls._instance._crf_pos_model = None
             cls._instance._break_table = None
+            cls._instance._combine_regex_method = None
         return cls._instance
 
     def load_crf_seg_model(self, path=None, **options):
@@ -78,7 +80,7 @@ class ResourceLoader(object):
                             word,
                             freq=freq,
                             tagging=tagging,
-                            source = 'dic',
+                            source='dic',
                         ))
             self._trie_tree = trie_tree
         return self._trie_tree
@@ -98,3 +100,22 @@ class ResourceLoader(object):
                     tree[label[0]] = label[1:]
             self._break_table = tree
         return self._break_table
+
+    def load_combine_regex_method(self, path=None):
+        if not self._combine_regex_method:
+            _combine_regex_list = []
+            if not path:
+                combine_regex_path = os.path.join(library_path, "combine.regex")
+            else:
+                combine_regex_path = path
+            with open(combine_regex_path) as combine_regex_file:
+                for line in combine_regex_file:
+                    regex = line.decode('utf-8').strip()
+                    if not regex or regex.startswith('#'):
+                        continue
+                    _combine_regex_list.append(regex)
+            self._combine_regex_method = re.compile(
+                '|'.join(_combine_regex_list),
+                re.UNICODE,
+            ).match
+        return self._combine_regex_method

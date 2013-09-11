@@ -191,6 +191,7 @@ class CombineSegmentProcess(BaseSegmentProcess):
         BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.trie = self.loader.load_trie_tree()
+        self.combine_regex_method = self.loader.load_combine_regex_method()
 
     def process(self, words):
         pos = 0
@@ -206,6 +207,8 @@ class CombineSegmentProcess(BaseSegmentProcess):
                     max_matching_pos = i
                 elif is_chinese_number(text) and chinese_to_number(text):
                     max_matching_pos = i
+                elif self.combine_regex_method(text):
+                    max_matching_pos = i
             if max_matching_pos == 0:
                 max_matching_pos = pos + 1
             text = ''.join(map(lambda x: x.text, words[pos:max_matching_pos]))
@@ -214,8 +217,11 @@ class CombineSegmentProcess(BaseSegmentProcess):
                 pre_word = copy.copy(dic[text])
                 pre_word.offset = word.offset
                 word = pre_word
-            else:
+            elif max_matching_pos == pos + 1:  # 无匹配
                 word = words[pos]
+            else:
+                word = Word(text)
+                word.offset = word.offset
             pre_words.append(word)
             pos = max_matching_pos
         return pre_words
