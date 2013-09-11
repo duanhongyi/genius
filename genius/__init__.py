@@ -13,7 +13,7 @@ def init_library():
     zfile = zipfile.ZipFile(zfile_path, 'r')
     for filename in zfile.namelist():
         file_path = os.path.join(here, 'library/%s' % filename)
-        if not os.path.exists(file_path):
+        if os.path.exists(file_path):
             continue
         if filename.endswith('/'):
             os.mkdir(file_path)
