@@ -40,12 +40,14 @@ Algorithm
 
     #encoding=utf-8
     import genius
-
+    text=u"""昨天,我和施瓦布先生一起与部分企业家进行了交流,大家对中国经济当前、未来发展的态势、走势都十分关心。李克强指出,一段时间以来,国际上对中国经济也有不少议论,有担心会不会出现一些国家曾经遇到过的增长过缓问题,甚至出现所谓的“硬着陆”"""
     seg_list = genius.seg_text(
-        u'我的英文名叫xiaoshenyang我是中国人民人均GDP消费不足5000.56元',
+        text,
         use_combine=True,
         use_pinyin_segment=True,
-        use_tagging=True)
+        use_tagging=True,
+        use_break=True
+    )
     print '\n'.join(['%s\t%s' % (word.text, word.tagging) for word in seg_list])
 
 功能 2)：面向索引分词
@@ -64,3 +66,7 @@ Algorithm
 
     seg_list = genius.seg_keywords(u'南京市长江大桥')
     print '\n'.join([word.text for word in seg_list])
+
+其他 3)：
+=================
+* 目前可供CRF学习的预料数据有限，人民日报1998年1月的数据较老，并且本身也有问题，所以导致分词效果不是很理想，又因为语料出自新闻，所以对于新闻分词较为准确。
