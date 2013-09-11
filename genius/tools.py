@@ -11,44 +11,42 @@ class StringHelper(object):
     halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
     fullwidth_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？'
     fullwidth_punctuation_range += u'＠［＼］＾＿｀｛｜｝～。、《》•”“'
+    punctuation_range = ''.join([
+        halfwidth_punctuation_range,
+        fullwidth_punctuation_range,
+    ])
 
     digit_pattern = u'[%s]' % digit_range
     alpha_pattern = u'[%s]' % alpha_range
     whitespace_pattern = u'[%s]' % whitespace_range
     halfwidth_punctuation_pattern = u'[%s]' % halfwidth_punctuation_range
-    punctuation_pattern = u'[%s]' % ''.join([
-        halfwidth_punctuation_range,
-        fullwidth_punctuation_range,
-    ])
+    punctuation_pattern = u'[%s]' % punctuation_range
     cjk_pattern = u'[^%s]' % ''.join([
         digit_range,
         alpha_range,
         whitespace_range,
-        halfwidth_punctuation_range,
+        punctuation_range,
     ])
-
-    group_marker = re.compile(
-        '|'.join(map(lambda x: '%s+[*?]*' % x, [
-            digit_pattern,
-            alpha_pattern,
-            whitespace_pattern,
-            halfwidth_punctuation_pattern,
-            cjk_pattern,
-        ]))
-    ).findall
 
     #单词分类标记
     @classmethod
     def mark_text(cls, text):
         marker = None
-        if re.match('^%s+[*?]*$' % cls.digit_pattern, text):  # 数字
+        if re.match(
+                '^%s+[*?]*$' % cls.digit_pattern,
+                text, re.UNICODE):  # 数字
             marker = 'DIGIT'
-        elif re.match('^%s+[*?]*$' % cls.alpha_pattern, text):  # 字母
+        elif re.match(
+                '^%s+[*?]*$' % cls.alpha_pattern,
+                text, re.UNICODE):  # 字母
             marker = 'ALPHA'
-        elif re.match('^%s+[*?]*$' % cls.whitespace_pattern, text):  # 空格字符
+        elif re.match(
+                '^%s+[*?]*$' % cls.whitespace_pattern,
+                text, re.UNICODE):  # 空格字符
             marker = 'WHITESPACE'
         elif re.match(
-                '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 半角符号
+                '^%s+[*?]*$' % cls.punctuation_pattern,
+                text, re.UNICODE):  # 半角符号
             marker = 'PUNC'
         else:
             marker = 'CJK'  # 中日韩
