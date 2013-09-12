@@ -48,7 +48,7 @@ class StringHelper(object):
         elif re.match('^%s+[*?]*$' % cls.whitespace_pattern, text):  # 空格字符
             marker = 'WHITESPACE'
         elif re.match(
-                '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 半角符号
+                '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 标点符号
             marker = 'PUNC'
         else:
             marker = 'CJK'  # 中日韩
