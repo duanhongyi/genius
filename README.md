@@ -40,12 +40,14 @@ Algorithm
 
     #encoding=utf-8
     import genius
-
+    text = u"""昨天,我和施瓦布先生一起与部分企业家进行了交流,大家对中国经济当前、未来发展的态势、走势都十分关心。"""
     seg_list = genius.seg_text(
-        u'中国人民站起来了pinyin',
+        text,
         use_combine=True,
         use_pinyin_segment=True,
-        use_tagging=True)
+        use_tagging=True,
+        use_break=True
+    )
     print '\n'.join(['%s\t%s' % (word.text, word.tagging) for word in seg_list])
 
 功能 2)：面向索引分词
@@ -62,5 +64,11 @@ Algorithm
     #encoding=utf-8
     import genius
 
-    seg_list = genius.seg_keywords(u'中国人民站起来了pinyin')
+    seg_list = genius.seg_keywords(u'南京市长江大桥')
     print '\n'.join([word.text for word in seg_list])
+
+
+其他说明 3)：
+=================
+* 目前分词语料出自人民日报1998年1月份，所以对于新闻类文章分词较为准确。
+* CRF分词效果很大程度上依赖于训练语料的类别以及覆盖度，若解决语料问题分词和标注效果还有很大的提升空间。

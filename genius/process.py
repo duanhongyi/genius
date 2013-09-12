@@ -1,4 +1,5 @@
 #encoding:utf-8
+import re
 import copy
 from .trie import TrieTree
 from .loader import ResourceLoader
@@ -8,6 +9,17 @@ from .digital import is_chinese_number, chinese_to_number
 
 
 class BaseSegmentProcess(object):
+
+    group_marker = re.compile(
+        '|'.join(map(lambda x: '%s+[*?]*' % x, [
+            StringHelper.digit_pattern,
+            StringHelper.alpha_pattern,
+            StringHelper.whitespace_pattern,
+            StringHelper.halfwidth_punctuation_pattern,
+            StringHelper.cjk_pattern,
+        ])),
+        re.UNICODE
+    ).findall
 
     def __init__(self, **kwargs):
         self.string_helper = StringHelper()
@@ -28,7 +40,7 @@ class BaseSegmentProcess(object):
         """
         将文本切割成以marker为单位的词
         """
-        groups = self.string_helper.group_marker(word.text)
+        groups = self.group_marker(word.text)
         return self.split_by_groups(word, groups)
 
 
