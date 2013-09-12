@@ -45,12 +45,8 @@ class StringHelper(object):
                 text, re.UNICODE):  # 空格字符
             marker = 'WHITESPACE'
         elif re.match(
-<<<<<<< HEAD
-                '^%s+[*?]*$' % cls.punctuation_pattern, text):  # 标点符号
-=======
                 '^%s+[*?]*$' % cls.punctuation_pattern,
-                text, re.UNICODE):  # 半角符号
->>>>>>> 4125bdf1ffbe4beca70e4e9afed33a9d97d78ffd
+                text, re.UNICODE):  # 标点符号
             marker = 'PUNC'
         else:
             marker = 'CJK'  # 中日韩
