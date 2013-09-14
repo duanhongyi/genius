@@ -60,7 +60,7 @@ class SimpleSegmentProcess(BaseSegmentProcess):
             pre_words = None
             if word.marker == 'WHITESPACE':
                 pre_words = base_words[offset:index]
-            elif index == length - 1:
+            elif index == length - 1:  # 最后一个word
                 pre_words = base_words[offset:length]
             if pre_words:
                 label = self.label_sequence(pre_words)
@@ -153,7 +153,8 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
         pos, length = 0, len(pre_words)
         result_words = []
         while pos < length:
-            dic = trie.search(u''.join([word.text for word in pre_words[pos:]]))
+            dic = trie.search(u''.join(
+                [word.text for word in pre_words[pos:]]))
             for i in range(pos + 1, length + 1):
                 word = u''.join([word.text for word in pre_words[pos:i]])
                 if word in dic:
