@@ -24,6 +24,7 @@ class ResourceLoader(object):
             cls._instance._crf_seg_model = None
             cls._instance._crf_pos_model = None
             cls._instance._break_table = None
+            cls._instance._break_regex_method = None
             cls._instance._combine_regex_method = None
         return cls._instance
 
@@ -75,7 +76,7 @@ class ResourceLoader(object):
                 with open(node_path) as f:
                     for line in f:
                         word, tagging, freq = line.decode(
-                            'utf-8').strip().split('\t')
+                            'utf8').strip().split('\t')
                         trie_tree.add(word, Word(
                             word,
                             freq=freq,
@@ -96,21 +97,44 @@ class ResourceLoader(object):
                 return
             with open(break_idx) as break_file:
                 for line in break_file:
-                    label = line.decode("utf-8").strip().split('\t')
+                    label = line.decode("utf8").strip().split('\t')
                     tree[label[0]] = label[1:]
             self._break_table = tree
         return self._break_table
+
+    def load_break_regex_method(self, path=None):
+        if not self._break_regex_method:
+            _break_regex_list = []
+            if not path:
+                break_regex_path = os.path.join(library_path, "break.regex")
+            else:
+                break_regex_path = path
+            with open(break_regex_path) as break_regex_file:
+                for line in break_regex_file:
+                    regex = line.decode('string-escape').decode('utf8').strip()
+                    if not regex or regex.startswith('#'):
+                        continue
+                    _break_regex_list.append(regex)
+            pattern = u'|'.join(
+                [u'[%s]+[*?]*' % regex for regex in _break_regex_list])
+            pattern += u'|[^%s]+[*?]*' % u''.join(_break_regex_list)
+            self._break_regex_method = re.compile(
+                pattern,
+                re.UNICODE,
+            ).findall
+        return self._break_regex_method
 
     def load_combine_regex_method(self, path=None):
         if not self._combine_regex_method:
             _combine_regex_list = []
             if not path:
-                combine_regex_path = os.path.join(library_path, "combine.regex")
+                combine_regex_path = os.path.join(
+                    library_path, "combine.regex")
             else:
                 combine_regex_path = path
             with open(combine_regex_path) as combine_regex_file:
                 for line in combine_regex_file:
-                    regex = line.decode('utf-8').strip()
+                    regex = line.decode('string-escape').decode('utf8').strip()
                     if not regex or regex.startswith('#'):
                         continue
                     _combine_regex_list.append(regex)

@@ -210,6 +210,7 @@ class BreakSegmentProcess(BaseSegmentProcess):
         BaseSegmentProcess.__init__(self, **kwargs)
         self.loader = ResourceLoader()
         self.tree = self.loader.load_break_table()
+        self.break_regex_method = self.loader.load_break_regex_method()
         self.segment_type = 'break'
 
     def process(self, words):
@@ -219,7 +220,12 @@ class BreakSegmentProcess(BaseSegmentProcess):
                 break_word_result.extend(
                     self.split_by_text_groups(word, self.tree[word.text]))
             else:
-                break_word_result.append(word)
+                text_groups = self.break_regex_method(word.text)
+                if len(text_groups) > 1:
+                    break_word_result.extend(
+                        self.split_by_text_groups(word, text_groups))
+                else:
+                    break_word_result.append(word)
         return break_word_result
 
 
