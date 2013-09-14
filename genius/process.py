@@ -25,12 +25,12 @@ class BaseSegmentProcess(object):
         self.string_helper = StringHelper()
         self.segment_type = 'marker'
 
-    def split_by_groups(self, word, groups):
-        length = len(groups)
+    def split_by_text_groups(self, word, text_groups):
+        length = len(text_groups)
         offset = word.offset
         words = []
         for index in range(length):
-            group = groups[index]
+            group = text_groups[index]
             word = Word(group, offset=offset, source=self.segment_type)
             offset += len(group)
             words.append(word)
@@ -41,7 +41,7 @@ class BaseSegmentProcess(object):
         将文本切割成以marker为单位的词
         """
         groups = self.group_marker(word.text)
-        return self.split_by_groups(word, groups)
+        return self.split_by_text_groups(word, groups)
 
 
 class SimpleSegmentProcess(BaseSegmentProcess):
@@ -79,8 +79,7 @@ class SimpleSegmentProcess(BaseSegmentProcess):
         ).decode('utf-8')
         return label.strip(self.string_helper.whitespace_range)
 
-    @classmethod
-    def segment(cls, label, words):
+    def segment(self, label, words):
         result_words = []
         offset = 0
         for index, label in enumerate(label.split('\n')):
@@ -90,6 +89,7 @@ class SimpleSegmentProcess(BaseSegmentProcess):
                     pre_word.text = u''.join(
                         [word.text for word in words[offset:index]]
                     )
+                    pre_word.source = self.segment_type
                     result_words.append(pre_word)
                 result_words.append(words[index])
                 offset = index + 1
@@ -98,11 +98,13 @@ class SimpleSegmentProcess(BaseSegmentProcess):
                 pre_word.text = u''.join(
                     [word.text for word in words[offset:index + 1]]
                 )
+                pre_word.source = self.segment_type
                 result_words.append(pre_word)
                 offset = index + 1
         if offset < len(words):
             pre_word = copy.copy(words[offset])
             pre_word.text = u''.join([word.text for word in words[offset:]])
+            pre_word.source = self.segment_type
             result_words.append(pre_word)
         return result_words
 
@@ -136,14 +138,14 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
                     [self.segment(label, pre_words) for label in labels],
                 )
                 result_words.extend(
-                    self.split_by_groups_keywords(pre_words, words_list))
+                    self.combine_by_words_list(pre_words, words_list))
                 offset = index + 1
             if word.marker == 'WHITESPACE':
                 result_words.append(word)
         return result_words
 
     @classmethod
-    def split_by_groups_keywords(cls, pre_words, words_list):
+    def combine_by_words_list(cls, pre_words, words_list):
         trie = TrieTree()
         for words in words_list:
             for word in words:
@@ -174,7 +176,7 @@ class PinyinSegmentProcess(BaseSegmentProcess):
             if word.marker == 'ALPHA':
                 pinyins = self.segment(word.text)
                 if pinyins:
-                    result_words.extend(self.split_by_groups(
+                    result_words.extend(self.split_by_text_groups(
                         word, pinyins))
                 else:
                     result_words.append(word)
@@ -214,7 +216,7 @@ class BreakSegmentProcess(BaseSegmentProcess):
         for word in words:
             if word.text in self.tree:
                 break_word_result.extend(
-                    self.split_by_groups(word, self.tree[word.text]))
+                    self.split_by_text_groups(word, self.tree[word.text]))
             else:
                 break_word_result.append(word)
         return break_word_result

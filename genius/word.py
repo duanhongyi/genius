@@ -12,16 +12,13 @@ class Word(object):
         # dic:字典,crf:crf生成,break:打断字典,pinyin拼音分词
         self.source = kwargs.get('source', 'unknown')
         self.offset = kwargs.get('offset', 0)  # 在文本中的位置
-        self._marker = None
 
     @property
     def marker(self):
         """
         see string_helper.mark_text method
         """
-        if not self._marker:
-            self._marker = self.string_helper.mark_text(self.text)
-        return self._marker
+        return self.string_helper.mark_text(self.text)
 
     def __str__(self):
         return self.text.encode('utf8')
