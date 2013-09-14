@@ -11,13 +11,13 @@ from .digital import is_chinese_number, chinese_to_number
 class BaseSegmentProcess(object):
 
     group_marker = re.compile(
-        '|'.join(map(lambda x: '%s+[*?]*' % x, [
-            StringHelper.digit_pattern,
-            StringHelper.alpha_pattern,
-            StringHelper.whitespace_pattern,
-            StringHelper.halfwidth_punctuation_pattern,
-            StringHelper.cjk_pattern,
-        ])),
+        '|'.join([
+            '%s{1,}?' % StringHelper.cjk_pattern,
+            '%s+[*?]*' % StringHelper.digit_pattern,
+            '%s+[*?]*' % StringHelper.alpha_pattern,
+            '%s+[*?]*' % StringHelper.whitespace_pattern,
+            '%s+[*?]*' % StringHelper.punctuation_pattern,
+        ]),
         re.UNICODE
     ).findall
 
@@ -53,39 +53,57 @@ class SimpleSegmentProcess(BaseSegmentProcess):
         self.segment_type = 'crf'
 
     def process(self, word):
-        words = BaseSegmentProcess.process(self, word)
-        pre_words = []
-        for word in words:
-            if word.marker == 'CJK':
-                label = self.label_sequence(word.text)
-                groups = self.segment(label, word.text)
-                pre_words.extend(self.split_by_groups(word, groups))
-            else:
-                pre_words.append(word)
-        return pre_words
+        base_words = BaseSegmentProcess.process(self, word)
+        result_words = []
+        offset, length = 0, len(base_words)
+        for index, word in enumerate(base_words):
+            pre_words = None
+            if word.marker == 'WHITESPACE':
+                pre_words = base_words[offset:index]
+            elif index == length - 1:
+                pre_words = base_words[offset:length]
+            if pre_words:
+                label = self.label_sequence(pre_words)
+                result_words.extend(self.segment(label, pre_words))
+                offset = index + 1
+            if word.marker == 'WHITESPACE':
+                result_words.append(word)
+        return result_words
 
-    def label_sequence(self, text, nbest=1):
+    def label_sequence(self, words, nbest=1):
         if self.seg_model.options.nbest != nbest:
             self.seg_model.options.nbest = nbest
         label = self.seg_model.label_sequence(
-            '\n'.join(text), False).decode('utf-8')
+            '\n'.join(['%s\t%s' % (word.text, word.marker) for word in words]),
+            False,
+        ).decode('utf-8')
         return label.strip(self.string_helper.whitespace_range)
 
     @classmethod
-    def segment(cls, label, text):
+    def segment(cls, label, words):
         result_words = []
         offset = 0
         for index, label in enumerate(label.split('\n')):
             if 'S' == label:
                 if index - offset > 1:
-                    result_words.append(text[offset:index])
-                result_words.append(text[index])
+                    pre_word = copy.copy(words[offset])
+                    pre_word.text = u''.join(
+                        [word.text for word in words[offset:index]]
+                    )
+                    result_words.append(pre_word)
+                result_words.append(words[index])
                 offset = index + 1
             elif 'E' == label:
-                result_words.append(text[offset:index + 1])
+                pre_word = copy.copy(words[offset])
+                pre_word.text = u''.join(
+                    [word.text for word in words[offset:index + 1]]
+                )
+                result_words.append(pre_word)
                 offset = index + 1
-        if offset < len(text):
-            result_words.append(text[offset:])
+        if offset < len(words):
+            pre_word = copy.copy(words[offset])
+            pre_word.text = u''.join([word.text for word in words[offset:]])
+            result_words.append(pre_word)
         return result_words
 
 
@@ -102,39 +120,44 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
             return self.crf_keywords(word, 2)
 
     def crf_keywords(self, word, nbest=2):
-        words = BaseSegmentProcess.process(self, word)
-        pre_words = []
-        for word in words:
-            if word.marker == 'CJK':
-                labels = self.label_sequence(word.text, nbest).split('\n\n')
+        base_words = BaseSegmentProcess.process(self, word)
+        result_words = []
+        offset, length = 0, len(base_words)
+        for index, word in enumerate(base_words):
+            pre_words = None
+            if word.marker == 'WHITESPACE':
+                pre_words = base_words[offset:index]
+            elif index == length - 1:
+                pre_words = base_words[offset:length]
+            if pre_words:
+                labels = self.label_sequence(pre_words, nbest).split('\n\n')
                 words_list = filter(
                     lambda x: x,
-                    [self.split_by_groups(
-                        word, self.segment(label, word.text)
-                    ) for label in labels],
+                    [self.segment(label, pre_words) for label in labels],
                 )
-                pre_words.extend(
-                    self.split_by_groups_keywords(word.text, words_list))
-            else:
-                pre_words.append(word)
-        return pre_words
+                result_words.extend(
+                    self.split_by_groups_keywords(pre_words, words_list))
+                offset = index + 1
+            if word.marker == 'WHITESPACE':
+                result_words.append(word)
+        return result_words
 
     @classmethod
-    def split_by_groups_keywords(cls, text, words_list):
+    def split_by_groups_keywords(cls, pre_words, words_list):
         trie = TrieTree()
         for words in words_list:
             for word in words:
                 trie[word.text] = word
-        pos, length = 0, len(text)
-        pre_words = []
+        pos, length = 0, len(pre_words)
+        result_words = []
         while pos < length:
-            dic = trie.search(text[pos:])
+            dic = trie.search(u''.join([word.text for word in pre_words[pos:]]))
             for i in range(pos + 1, length + 1):
-                word = text[pos:i]
+                word = u''.join([word.text for word in pre_words[pos:i]])
                 if word in dic:
-                    pre_words.append(dic[word])
+                    result_words.append(dic[word])
             pos += 1
-        return pre_words
+        return result_words
 
 
 class PinyinSegmentProcess(BaseSegmentProcess):
@@ -146,23 +169,23 @@ class PinyinSegmentProcess(BaseSegmentProcess):
         self.segment_type = 'pinyin'
 
     def process(self, words):
-        pre_words = []
+        result_words = []
         for word in words:
             if word.marker == 'ALPHA':
                 pinyins = self.segment(word.text)
                 if pinyins:
-                    pre_words.extend(self.split_by_groups(
+                    result_words.extend(self.split_by_groups(
                         word, pinyins))
                 else:
-                    pre_words.append(word)
+                    result_words.append(word)
             else:
-                pre_words.append(word)
-        return pre_words
+                result_words.append(word)
+        return result_words
 
     def segment(self, text):
         length = len(text)
         pos = 0
-        pre_words = []
+        result_words = []
         while pos < length:
             dic = self.trie.search(text[pos:length])
             max_matching_pos = 0
@@ -173,9 +196,9 @@ class PinyinSegmentProcess(BaseSegmentProcess):
                 return None
             else:
                 pinyin = text[pos:max_matching_pos]
-                pre_words.append(pinyin)
+                result_words.append(pinyin)
             pos = max_matching_pos
-        return pre_words
+        return result_words
 
 
 class BreakSegmentProcess(BaseSegmentProcess):
@@ -208,7 +231,7 @@ class CombineSegmentProcess(BaseSegmentProcess):
     def process(self, words):
         pos = 0
         length = len(words)
-        pre_words = []
+        result_words = []
         while pos < length:
             max_matching_pos = 0
             dic = self.trie.search(''.join(
@@ -234,9 +257,9 @@ class CombineSegmentProcess(BaseSegmentProcess):
             else:
                 word = Word(text)
                 word.offset = word.offset
-            pre_words.append(word)
+            result_words.append(word)
             pos = max_matching_pos
-        return pre_words
+        return result_words
 
 
 class TaggingProcess(object):
