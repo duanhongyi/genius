@@ -9,8 +9,7 @@ class StringHelper(object):
     alpha_range = u'a-zA-Z\uff41-\uff5a\uff21-\uff3a'
     whitespace_range = u'\t\n\x0b\x0c\r '
     halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    fullwidth_punctuation_range = u'！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？'
-    fullwidth_punctuation_range += u'＠［＼］＾＿｀｛｜｝～。、《》•”“'
+    fullwidth_punctuation_range = u'\uff01-\uff5e'
     punctuation_range = ''.join([
         halfwidth_punctuation_range,
         fullwidth_punctuation_range,
