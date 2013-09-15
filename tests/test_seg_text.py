@@ -1,3 +1,4 @@
+#encoding:utf8
 import genius
 
 def test_seg_text():
