@@ -1,7 +1,6 @@
 #encoding:utf-8
 import re
 import copy
-from .trie import TrieTree
 from .loader import ResourceLoader
 from .tools import StringHelper
 from .word import Word
@@ -79,31 +78,31 @@ class SimpleSegmentProcess(BaseSegmentProcess):
         ).decode('utf-8')
         return label.strip(self.string_helper.whitespace_range)
 
-    def segment(self, label, words):
+    def segment(self, label, pre_words):
         result_words = []
         offset = 0
         for index, label in enumerate(label.split('\n')):
             if 'S' == label:
                 if index - offset > 1:
-                    pre_word = copy.copy(words[offset])
+                    pre_word = copy.copy(pre_words[offset])
                     pre_word.text = u''.join(
-                        [word.text for word in words[offset:index]]
+                        [word.text for word in pre_words[offset:index]]
                     )
                     pre_word.source = self.segment_type
                     result_words.append(pre_word)
-                result_words.append(words[index])
+                result_words.append(pre_words[index])
                 offset = index + 1
             elif 'E' == label:
-                pre_word = copy.copy(words[offset])
+                pre_word = copy.copy(pre_words[offset])
                 pre_word.text = u''.join(
-                    [word.text for word in words[offset:index + 1]]
+                    [word.text for word in pre_words[offset:index + 1]]
                 )
                 pre_word.source = self.segment_type
                 result_words.append(pre_word)
                 offset = index + 1
-        if offset < len(words):
-            pre_word = copy.copy(words[offset])
-            pre_word.text = u''.join([word.text for word in words[offset:]])
+        if offset < len(pre_words):
+            pre_word = copy.copy(pre_words[offset])
+            pre_word.text = u''.join([word.text for word in pre_words[offset:]])
             pre_word.source = self.segment_type
             result_words.append(pre_word)
         return result_words
@@ -133,12 +132,12 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
                 pre_words = base_words[offset:length]
             if pre_words:
                 labels = self.label_sequence(pre_words, nbest).split('\n\n')
-                words_list = filter(
-                    lambda x: x,
-                    [self.segment(label, pre_words) for label in labels],
-                )
+                words_list = []
+                for label in labels:
+                    if label:
+                        words_list.extend(self.segment(label, pre_words))
                 result_words.extend(
-                    self.combine_by_words_list(pre_words, words_list))
+                    self.combine_by_words_list(pre_words, set(words_list)))
                 offset = index + 1
             if word.marker == 'WHITESPACE':
                 result_words.append(word)
@@ -146,19 +145,18 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
 
     @classmethod
     def combine_by_words_list(cls, pre_words, words_list):
-        trie = TrieTree()
-        for words in words_list:
-            for word in words:
-                trie[word.text] = word
+        for w in words_list:
+            print('%s\t%s' % (w.text, w.offset))
         pos, length = 0, len(pre_words)
         result_words = []
         while pos < length:
-            dic = trie.search(u''.join(
-                [word.text for word in pre_words[pos:]]))
             for i in range(pos + 1, length + 1):
-                word = u''.join([word.text for word in pre_words[pos:i]])
-                if word in dic:
-                    result_words.append(dic[word])
+                text = u''.join([word.text for word in pre_words[pos:i]])
+                word = Word(text, offset=pos, source='crf')
+                if word in words_list:
+                    result_words.append(word)
+                else:
+                    print('%s\t%s' % (word.text, word.offset))
             pos += 1
         return result_words
 

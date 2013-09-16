@@ -25,3 +25,18 @@ class Word(object):
 
     def __len__(self):
         return len(self.text)
+
+    def __hash__(self):
+        return hash(self.text)
+
+    def __eq__(self, obj):
+        if isinstance(obj, type(self)):
+            return (
+                obj.text == self.text and 
+                obj.freq == self.freq and
+                obj.tagging == self.tagging and
+                obj.source == self.source and
+                obj.offset == self.offset
+            )
+        return False
+
