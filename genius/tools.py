@@ -5,7 +5,7 @@ import re
 class StringHelper(object):
 
     #range
-    digit_range = u'0-9\uff11-\uff19'
+    digit_range = u'0-9\uff10-\uff19'
     alpha_range = u'a-zA-Z\uff41-\uff5a\uff21-\uff3a'
     whitespace_range = u'\t\n\x0b\x0c\r '
     halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
