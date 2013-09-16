@@ -10,7 +10,7 @@ class StringHelper(object):
     whitespace_range = u'\t\n\x0b\x0c\r '
     halfwidth_punctuation_range = u'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
     fullwidth_punctuation_range = u'\uff01-\uff5e'
-    punctuation_range = ''.join([
+    punctuation_range = u''.join([
         halfwidth_punctuation_range,
         fullwidth_punctuation_range,
     ])

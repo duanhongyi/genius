@@ -111,7 +111,7 @@ class ResourceLoader(object):
                 break_regex_path = path
             with open(break_regex_path) as break_regex_file:
                 for line in break_regex_file:
-                    regex = line.decode('string-escape').decode('utf8').strip()
+                    regex = line.decode('unicode-escape').strip()
                     if not regex or regex.startswith('#'):
                         continue
                     _break_regex_list.append(regex)
@@ -134,7 +134,7 @@ class ResourceLoader(object):
                 combine_regex_path = path
             with open(combine_regex_path) as combine_regex_file:
                 for line in combine_regex_file:
-                    regex = line.decode('string-escape').decode('utf8').strip()
+                    regex = line.decode('unicode-escape').strip()
                     if not regex or regex.startswith('#'):
                         continue
                     _combine_regex_list.append(regex)

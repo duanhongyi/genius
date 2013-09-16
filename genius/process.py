@@ -145,18 +145,16 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
 
     @classmethod
     def combine_by_words_list(cls, pre_words, words_list):
-        for w in words_list:
-            print('%s\t%s' % (w.text, w.offset))
         pos, length = 0, len(pre_words)
         result_words = []
         while pos < length:
             for i in range(pos + 1, length + 1):
                 text = u''.join([word.text for word in pre_words[pos:i]])
-                word = Word(text, offset=pos, source='crf')
+                word = copy.copy(pre_words[pos])
+                word.text = text
+                word.source = 'crf'
                 if word in words_list:
                     result_words.append(word)
-                else:
-                    print('%s\t%s' % (word.text, word.offset))
             pos += 1
         return result_words
 
