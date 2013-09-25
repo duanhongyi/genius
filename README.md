@@ -1,6 +1,6 @@
-genius
+Genius
 ========
-Genius是一个开源的python中文分词组件，采用 CRF(Conditional Random Field)条件随机场算法。“条件随机场”被用于中文分词和词性标注等词法分析工作，一般序列分类模型常常采用隐马尔可夫模型（HMM），像基于类的中文分词。但隐马尔可夫模型中存在两个假设：输出独立性假设和马尔可夫性假设。其中，输出独立性假设要求序列数据严格相互独立才能保证推导的正确性，而事实上大多数序列数据不能被表示成一系列独立事件。而条件随机场则使用一种概率图模型，具有表达长距离依赖性和交叠性特征的能力，能够较好地解决标注（分类）偏置等问题的优点，而且所有特征可以进行全局归一化，能够求得全局的最优解，其缺点是训练代价大、复杂度高。
+Genius是一个开源的python中文分词组件，采用 CRF(Conditional Random Field)条件随机场算法。
 
 Feature
 ========
@@ -11,11 +11,15 @@ Feature
 * 支持用户自定义合并词典
 * 支持词性标注
 
-Install
+Source Install
 ==========
 * 安装git: 1) ubuntu or debian `apt-get install git` 2) fedora or redhat `yum install git`
-* 可以通过源码安装：`git clone https://github.com/duanhongyi/genius.git`然后运行`python setup.py install`
-* 或者直接使用easy_install(`easy_install genius`)或者pip(`pip install genius`)安装
+* 下载代码：`git clone https://github.com/duanhongyi/genius.git`
+* 安装代码：`python setup.py install`
+
+Pypi Install
+============
+* 执行命令：`easy_install genius`或者`pip install genius`
 
 
 Algorithm
