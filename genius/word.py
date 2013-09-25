@@ -22,7 +22,7 @@ class Word(object):
         return self.string_helper.mark_text(self.text)
 
     def __str__(self):
-        if not six.PY3:
+        if six.PY2:
             return self.text.encode('utf8')
         return self.text
 
