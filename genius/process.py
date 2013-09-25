@@ -288,7 +288,7 @@ class TaggingProcess(object):
         label_text = self.tagging_model.label_sequence(
             '\n'.join(label_sequence_texts),
             include_input=False,
-        ).strip(self.string_helper.whitespace_range)
+        ).decode('utf8').strip(self.string_helper.whitespace_range)
         taggings = label_text.split('\n')
         map(lambda x: taggings.insert(x, 'x'), unlabel_sequence_indexes)
         return taggings

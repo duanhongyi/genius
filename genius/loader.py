@@ -73,7 +73,7 @@ class ResourceLoader(object):
                 if not node_path.endswith('.dic'):
                     continue
                 node_path = os.sep.join([path, node_path])
-                with open(node_path) as f:
+                with open(node_path, 'rb') as f:
                     for line in f:
                         word, tagging, freq = line.decode(
                             'utf8').strip().split('\t')
@@ -95,7 +95,7 @@ class ResourceLoader(object):
             tree = {}
             if not os.path.exists(break_idx):
                 return
-            with open(break_idx) as break_file:
+            with open(break_idx, 'rb') as break_file:
                 for line in break_file:
                     label = line.decode("utf8").strip().split('\t')
                     tree[label[0]] = label[1:]
@@ -109,7 +109,7 @@ class ResourceLoader(object):
                 break_regex_path = os.path.join(library_path, "break.regex")
             else:
                 break_regex_path = path
-            with open(break_regex_path) as break_regex_file:
+            with open(break_regex_path, 'rb') as break_regex_file:
                 for line in break_regex_file:
                     regex = line.decode('unicode-escape').strip()
                     if not regex or regex.startswith('#'):
@@ -132,7 +132,7 @@ class ResourceLoader(object):
                     library_path, "combine.regex")
             else:
                 combine_regex_path = path
-            with open(combine_regex_path) as combine_regex_file:
+            with open(combine_regex_path, 'rb') as combine_regex_file:
                 for line in combine_regex_file:
                     regex = line.decode('unicode-escape').strip()
                     if not regex or regex.startswith('#'):

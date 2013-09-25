@@ -1,4 +1,5 @@
 #encoding:utf-8
+import six
 from genius.tools import StringHelper
 
 
@@ -21,7 +22,9 @@ class Word(object):
         return self.string_helper.mark_text(self.text)
 
     def __str__(self):
-        return self.text.encode('utf8')
+        if not six.PY3:
+            return self.text.encode('utf8')
+        return self.text
 
     def __len__(self):
         return len(self.text)

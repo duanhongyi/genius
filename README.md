@@ -48,7 +48,7 @@ Algorithm
         use_tagging=True,
         use_break=True
     )
-    print '\n'.join(['%s\t%s' % (word.text, word.tagging) for word in seg_list])
+    print('\n'.join(['%s\t%s' % (word.text, word.tagging) for word in seg_list]))
 
 功能 2)：面向索引分词
 ==============
@@ -65,7 +65,7 @@ Algorithm
     import genius
 
     seg_list = genius.seg_keywords(u'南京市长江大桥')
-    print '\n'.join([word.text for word in seg_list])
+    print('\n'.join([word.text for word in seg_list]))
 
 
 其他说明 3)：

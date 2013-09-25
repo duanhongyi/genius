@@ -9,6 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 
 requires = [
+    'six',
     'nose',
     'libwapiti',
     'setuptools>=1.0',
