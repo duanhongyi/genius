@@ -10,7 +10,6 @@ Feature
 * 支持用户自定义break
 * 支持用户自定义词典
 * 支持词性标注
-* 支持python3
 
 Install
 ==========
