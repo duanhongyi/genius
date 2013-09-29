@@ -1,28 +1,30 @@
-genius
+Genius
 ========
-genius中文分词，是基于crf条件随机场的分组件
-
+Genius是一个开源的python中文分词组件，采用 CRF(Conditional Random Field)条件随机场算法。
 
 Feature
 ========
 
-* 支持pinyin分词
+* 支持python2.x、python3.x以及pypy2.x。
+* 支持简单的pinyin分词
 * 支持用户自定义break
-* 支持用户自定义词典
+* 支持用户自定义合并词典
 * 支持词性标注
 
-Install
+Source Install
 ==========
 * 安装git: 1) ubuntu or debian `apt-get install git` 2) fedora or redhat `yum install git`
-* 升级setuptools: `pip install easy_install --upgrade`
-* 升级pip: `pip install pip --upgrade`
-* `pip install genius`
-* 通过`import genius`来引用
+* 下载代码：`git clone https://github.com/duanhongyi/genius.git`
+* 安装代码：`python setup.py install`
+
+Pypi Install
+============
+* 执行命令：`easy_install genius`或者`pip install genius`
 
 
 Algorithm
 ==========
-* 采用trie树进行词典查找
+* 采用trie树进行合并词典查找
 * 基于wapiti实现条件随机场分词
 * 可以通过genius.loader.ResourceLoader来重载默认的字典
 
