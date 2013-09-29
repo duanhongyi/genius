@@ -21,7 +21,7 @@ def init_library():
             data = zfile.read(filename)
             with closing(open(file_path, 'w+b')) as f:
                 f.write(data)
-                f.close()
+                f.flush()
 init_library()
 
 
