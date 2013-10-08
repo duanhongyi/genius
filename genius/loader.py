@@ -28,8 +28,9 @@ class ResourceLoader(object):
             cls._instance._combine_regex_method = None
         return cls._instance
 
-    def load_crf_seg_model(self, path=None, **options):
-        if not self._crf_seg_model:
+    def load_crf_seg_model(self, path=None, force=False):
+        if not self._crf_seg_model or force:
+            options = {}
             if path:
                 options['model'] = path
             else:
@@ -46,8 +47,9 @@ class ResourceLoader(object):
             self._crf_seg_model = _crf_seg_model
         return self._crf_seg_model
 
-    def load_crf_pos_model(self, path=None, **options):
-        if not self._crf_pos_model:
+    def load_crf_pos_model(self, path=None, force=False):
+        if not self._crf_pos_model or force:
+            options = {}
             if path:
                 options['model'] = path
             else:
@@ -64,8 +66,8 @@ class ResourceLoader(object):
             self._crf_pos_model = _crf_pos_model
         return self._crf_pos_model
 
-    def load_trie_tree(self, path=None):
-        if not self._trie_tree:
+    def load_trie_tree(self, path=None, force=False):
+        if not self._trie_tree or force:
             trie_tree = TrieTree()
             if not path:
                 path = library_path
@@ -86,8 +88,8 @@ class ResourceLoader(object):
             self._trie_tree = trie_tree
         return self._trie_tree
 
-    def load_break_table(self, path=None):
-        if not self._break_table:
+    def load_break_table(self, path=None, force=False):
+        if not self._break_table or force:
             if not path:
                 break_idx = os.path.join(library_path, "break.txt")
             else:
@@ -102,8 +104,8 @@ class ResourceLoader(object):
             self._break_table = tree
         return self._break_table
 
-    def load_break_regex_method(self, path=None):
-        if not self._break_regex_method:
+    def load_break_regex_method(self, path=None, force=False):
+        if not self._break_regex_method or force:
             _break_regex_list = []
             if not path:
                 break_regex_path = os.path.join(library_path, "break.regex")
@@ -124,8 +126,8 @@ class ResourceLoader(object):
             ).findall
         return self._break_regex_method
 
-    def load_combine_regex_method(self, path=None):
-        if not self._combine_regex_method:
+    def load_combine_regex_method(self, path=None, force=False):
+        if not self._combine_regex_method or force:
             _combine_regex_list = []
             if not path:
                 combine_regex_path = os.path.join(
