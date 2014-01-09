@@ -31,12 +31,12 @@ Algorithm
 功能 1)：分词`genius.seg_text`方法
 ==============
 
-* `genius.seg_text`函数接受5个参数: 
-* `text`第一个参数为需要分词的字符 
-* `use_break`代表对分词结构进行打断处理 
-* `use_combine`代表是否使用字典进行词合并
-* `use_tagging`代表是否进行词性标注
-* `use_pinyin_segment`代表是否对拼音进行分词处理
+* `genius.seg_text`函数接受5个参数，其中text是必填参数: 
+* `text`第一个参数为需要分词的字符
+* `use_break`代表对分词结构进行打断处理，默认值`True`
+* `use_combine`代表是否使用字典进行词合并，默认值`False`
+* `use_tagging`代表是否进行词性标注，默认值`True`
+* `use_pinyin_segment`代表是否对拼音进行分词处理，默认值`True`
 
 代码示例( 全功能分词 )
 
@@ -54,11 +54,11 @@ Algorithm
 
 功能 2)：面向索引分词
 ==============
-* `genius.seg_keywords`方法专门为搜索引擎索引准备，保留歧义分割。
+* `genius.seg_keywords`方法专门为搜索引擎索引准备，保留歧义分割，其中text是必填参数。
 * `text`第一个参数为需要分词的字符 
-* `use_break`代表对分词结构进行打断处理 
-* `use_tagging`代表是否进行词性标注
-* `use_pinyin_segment`代表是否对拼音进行分词处理
+* `use_break`代表对分词结构进行打断处理，默认值`True`
+* `use_tagging`代表是否进行词性标注，默认值`False`
+* `use_pinyin_segment`代表是否对拼音进行分词处理，默认值`False`
 * 由于合并操作与此方法有意义上的冲突，此方法并不提供合并功能；并且如果采用此方法做索引时候，检索时不推荐`genius.seg_text`使用`use_combine=True`参数。
 
 代码示例
@@ -69,8 +69,23 @@ Algorithm
     seg_list = genius.seg_keywords(u'南京市长江大桥')
     print('\n'.join([word.text for word in seg_list]))
 
+功能 3)：关键词提取
+==============
+* `genius.tag_extract`方法专门为提取tag关键字准备，其中text是必填参数。
+* `text`第一个参数为需要分词的字符 
+* `use_break`代表对分词结构进行打断处理，默认值`True`
+* `use_combine`代表是否使用字典进行词合并，默认值`False`
+* `use_pinyin_segment`代表是否对拼音进行分词处理，默认值`False`
 
-其他说明 3)：
+代码示例
+
+    #encoding=utf-8
+    import genius
+
+    tag_list = genius.tag_extract(u'南京市长江大桥')
+    print('\n'.join(tag_list)
+
+其他说明 4)：
 =================
 * 目前分词语料出自人民日报1998年1月份，所以对于新闻类文章分词较为准确。
 * CRF分词效果很大程度上依赖于训练语料的类别以及覆盖度，若解决语料问题分词和标注效果还有很大的提升空间。

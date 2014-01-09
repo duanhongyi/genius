@@ -23,6 +23,7 @@ class ResourceLoader(object):
             cls._instance._trie_tree = None
             cls._instance._crf_seg_model = None
             cls._instance._crf_pos_model = None
+            cls._instance._idf_table=None
             cls._instance._break_table = None
             cls._instance._break_regex_method = None
             cls._instance._combine_regex_method = None
@@ -87,6 +88,22 @@ class ResourceLoader(object):
                         ))
             self._trie_tree = trie_tree
         return self._trie_tree
+
+    def load_idf_table(self, path=None, force=False):
+        if not self._idf_table or force:
+            if not path:
+                idf_path = os.path.join(library_path, "idf.txt")
+            else:
+                idf_path = path 
+            tree = {}
+            if not os.path.exists(idf_path):
+                return
+            with open(idf_path, 'rb') as idf_file:
+                for line in idf_file:
+                    label = line.decode("utf8").strip().split('\t')
+                    tree[label[0]] = float(label[1])
+            self._idf_table = tree
+        return self._idf_table
 
     def load_break_table(self, path=None, force=False):
         if not self._break_table or force:

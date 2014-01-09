@@ -102,7 +102,9 @@ class SimpleSegmentProcess(BaseSegmentProcess):
                 offset = index + 1
         if offset < len(pre_words):
             pre_word = copy.copy(pre_words[offset])
-            pre_word.text = u''.join([word.text for word in pre_words[offset:]])
+            pre_word.text = u''.join(
+                [word.text for word in pre_words[offset:]]
+            )
             pre_word.source = self.segment_type
             result_words.append(pre_word)
         return result_words
@@ -315,6 +317,30 @@ class TaggingProcess(object):
         return taggings
 
 
+class TagExtractProcess(object):
+
+    def __init__(self, **kwargs):
+        self.string_helper = StringHelper()
+        self.loader = ResourceLoader()
+        self.idf_table = self.loader.load_idf_table()
+        self.default_idf = sorted(
+            self.idf_table.values()
+        )[int(len(self.idf_table)/2)]
+        self.ntop = kwargs.get('ntop', 20)
+
+    def process(self, words):
+        idf_table = {}
+        for word in words:
+            if len(word) > 1:
+                idf_table[word.text] = idf_table.get(word.text, 0.0) + 1.0
+        total = sum(idf_table.values())
+        idf_table = [(text, idf/total) for text, idf in idf_table.items()]
+        tf_idf_list = sorted([(
+            idf * self.idf_table.get(text, self.default_idf),
+            text,
+        ) for text, idf in idf_table], reverse=True)[:self.ntop]
+        return [tf_idf[1] for tf_idf in tf_idf_list]
+
 processes = {
     'default': SimpleSegmentProcess,
     'break': BreakSegmentProcess,
@@ -322,4 +348,5 @@ processes = {
     'pinyin_segment': PinyinSegmentProcess,
     'segment_keywords': KeywordsSegmentProcess,
     'tagging': TaggingProcess,
+    'tag_extract': TagExtractProcess,
 }
