@@ -82,7 +82,7 @@ Algorithm
     #encoding=utf-8
     import genius
 
-    tag_list = genius.tag_extract(u'南京市长江大桥')
+    tag_list = genius.extract_tag(u'南京市长江大桥')
     print('\n'.join(tag_list))
 
 其他说明 4)：
