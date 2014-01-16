@@ -63,7 +63,7 @@ def seg_keywords(text, **kwargs):
         pre_words = processes['tagging'](**kwargs).process(pre_words)
     return pre_words
 
-def tag_extract(text, **kwargs):
+def extract_tag(text, **kwargs):
     """
     text: 必须是unicode
     ntop: 提取前n个关键字
