@@ -157,8 +157,18 @@ class ResourceLoader(object):
                     if not regex or regex.startswith('#'):
                         continue
                     _combine_regex_list.append(regex)
-            self._combine_regex_method = re.compile(
+            match = re.compile(
                 '|'.join(_combine_regex_list),
                 re.UNICODE,
             ).match
+            """
+            fix '^a$' regex can match 'a\n'
+            """
+            def _combine_regex_method(text):
+                m = match(text)
+                if m and m.group() == text:
+                    return True
+                else:
+                    return False
+            self._combine_regex_method = _combine_regex_method
         return self._combine_regex_method
