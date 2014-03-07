@@ -2,5 +2,3 @@ include README.md
 include MANIFEST.in
 include CHANGES.txt
 include genius/library/library.zip
-include genius/library/break.regex
-include genius/library/combine.regex
