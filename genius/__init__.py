@@ -8,23 +8,6 @@ from .word import Word
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-def init_library():
-    zfile_path = os.path.join(here, 'library/library.zip')
-    zfile = zipfile.ZipFile(zfile_path, 'r')
-    for filename in zfile.namelist():
-        file_path = os.path.join(here, 'library/%s' % filename)
-        if os.path.exists(file_path):
-            continue
-        if filename.endswith('/'):
-            os.mkdir(file_path)
-        else:
-            data = zfile.read(filename)
-            with closing(open(file_path, 'w+b')) as f:
-                f.write(data)
-                f.flush()
-init_library()
-
-
 def seg_text(text, **kwargs):
     """
     text: 必须是unicode
