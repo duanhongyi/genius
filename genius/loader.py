@@ -137,10 +137,8 @@ class ResourceLoader(object):
             pattern = u'|'.join(
                 [u'[%s]+[*?]*' % regex for regex in _break_regex_list])
             pattern += u'|[^%s]+[*?]*' % u''.join(_break_regex_list)
-            self._break_regex_method = re.compile(
-                pattern,
-                re.UNICODE,
-            ).findall
+            regex_compile = re.compile(pattern, re.UNICODE)
+            self._break_regex_method = regex_compile.findall
         return self._break_regex_method
 
     def load_combine_regex_method(self, path=None, force=False):
@@ -157,13 +155,12 @@ class ResourceLoader(object):
                     if not regex or regex.startswith('#'):
                         continue
                     _combine_regex_list.append(regex)
+            regex_compile = re.compile('|'.join(_combine_regex_list), re.UNICODE)
             """
             fix '^a$' regex can match 'a\n'
             """
             def _combine_regex_method(text):
-                m = re.compile(
-                    '|'.join(_combine_regex_list), re.UNICODE
-                ).match(text)
+                m = regex_compile.match(text)
                 if m and m.group() == text:
                     return True
                 else:
