@@ -1,5 +1,6 @@
 #encoding:utf-8
 import os
+import io
 import zipfile
 from contextlib import closing
 from .process import processes

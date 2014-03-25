@@ -47,13 +47,7 @@ has_unit = re.compile((u'+[*?]*|'.join(CN_UNIT.keys())), re.UNICODE).findall
 chinese_number_regex = '^['+u''.join(
     list(CN_UNIT.keys()) + list(CN_NUM.keys()))+']+$'
 
-is_chinese_number_compile = re.compile(chinese_number_regex, re.UNICODE)
-def is_chinese_number(text):
-    m = is_chinese_number_compile.match(text) 
-    if m and m.group() == text:
-        return True
-    return False
-
+is_chinese_number = re.compile(chinese_number_regex, re.UNICODE).match
 
 
 def chinese_to_number(cn):

@@ -54,19 +54,18 @@ class SimpleSegmentProcess(BaseSegmentProcess):
     def process(self, word):
         base_words = BaseSegmentProcess.process(self, word)
         result_words = []
-        offset, length = 0, len(base_words)
-        for index, word in enumerate(base_words):
-            pre_words = None
-            if word.marker == 'WHITESPACE':
-                pre_words = base_words[offset:index]
-            elif index == length - 1:  # 最后一个word
-                pre_words = base_words[offset:length]
-            if pre_words:
-                label = self.label_sequence(pre_words)
-                result_words.extend(self.segment(label, pre_words))
-                offset = index + 1
-            if word.marker == 'WHITESPACE':
+        pre_label_words = []
+        for word in base_words:
+            if word.marker != 'WHITESPACE':
+                pre_label_words.append(word)
+            else:
+                label = self.label_sequence(pre_label_words)
+                result_words.extend(self.segment(label, pre_label_words))
+                pre_label_words = []
                 result_words.append(word)
+        if pre_label_words:
+            label = self.label_sequence(pre_label_words)
+            result_words.extend(self.segment(label, pre_label_words))
         return result_words
 
     def label_sequence(self, words, nbest=1):
@@ -78,32 +77,32 @@ class SimpleSegmentProcess(BaseSegmentProcess):
         ).decode('utf-8')
         return label.strip(self.string_helper.whitespace_range)
 
-    def segment(self, label, pre_words):
+    def segment(self, label, pre_label_words):
         result_words = []
         offset = 0
         for index, label in enumerate(label.split('\n')):
             if 'S' == label:
                 if index - offset > 1:
-                    pre_word = copy.copy(pre_words[offset])
+                    pre_word = copy.copy(pre_label_words[offset])
                     pre_word.text = u''.join(
-                        [word.text for word in pre_words[offset:index]]
+                        [word.text for word in pre_label_words[offset:index]]
                     )
                     pre_word.source = self.segment_type
                     result_words.append(pre_word)
-                result_words.append(pre_words[index])
+                result_words.append(pre_label_words[index])
                 offset = index + 1
             elif 'E' == label:
-                pre_word = copy.copy(pre_words[offset])
+                pre_word = copy.copy(pre_label_words[offset])
                 pre_word.text = u''.join(
-                    [word.text for word in pre_words[offset:index + 1]]
+                    [word.text for word in pre_label_words[offset:index + 1]]
                 )
                 pre_word.source = self.segment_type
                 result_words.append(pre_word)
                 offset = index + 1
-        if offset < len(pre_words):
-            pre_word = copy.copy(pre_words[offset])
+        if offset < len(pre_label_words):
+            pre_word = copy.copy(pre_label_words[offset])
             pre_word.text = u''.join(
-                [word.text for word in pre_words[offset:]]
+                [word.text for word in pre_label_words[offset:]]
             )
             pre_word.source = self.segment_type
             result_words.append(pre_word)
@@ -125,34 +124,37 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
     def crf_keywords(self, word, nbest=2):
         base_words = BaseSegmentProcess.process(self, word)
         result_words = []
-        offset, length = 0, len(base_words)
-        for index, word in enumerate(base_words):
-            pre_words = None
-            if word.marker == 'WHITESPACE':
-                pre_words = base_words[offset:index]
-            elif index == length - 1:
-                pre_words = base_words[offset:length]
-            if pre_words:
-                labels = self.label_sequence(pre_words, nbest).split('\n\n')
-                words_list = []
-                for label in labels:
-                    if label:
-                        words_list.extend(self.segment(label, pre_words))
-                result_words.extend(
-                    self.combine_by_words_list(pre_words, set(words_list)))
-                offset = index + 1
-            if word.marker == 'WHITESPACE':
+        pre_label_words = []
+        for word in base_words:
+            if word.marker != 'WHITESPACE':
+                pre_label_words.append(word)
+            else:
+                labels = self.label_sequence(
+                    pre_label_words, nbest).split('\n\n')
+                result_words.extend(self.segment(labels, pre_label_words))
                 result_words.append(word)
+        if pre_label_words:
+            labels = self.label_sequence(pre_label_words, nbest).split('\n\n')
+            result_words.extend(self.segment(labels, pre_label_words))
         return result_words
 
+    def segment(self, labels, pre_label_words):
+        words_list = []
+        for label in labels:
+            if label:
+                words_list.extend(
+                    SimpleSegmentProcess.segment(
+                        self, label, pre_label_words))
+        return self.combine_by_words_list(pre_label_words, set(words_list))
+
     @classmethod
-    def combine_by_words_list(cls, pre_words, words_list):
-        pos, length = 0, len(pre_words)
+    def combine_by_words_list(cls, pre_label_words, words_list):
+        pos, length = 0, len(pre_label_words)
         result_words = []
         while pos < length:
             for i in range(pos + 1, length + 1):
-                text = u''.join([word.text for word in pre_words[pos:i]])
-                word = copy.copy(pre_words[pos])
+                text = u''.join([word.text for word in pre_label_words[pos:i]])
+                word = copy.copy(pre_label_words[pos])
                 word.text = text
                 word.source = 'crf'
                 if word in words_list:
