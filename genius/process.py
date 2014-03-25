@@ -132,6 +132,7 @@ class KeywordsSegmentProcess(SimpleSegmentProcess):
                 labels = self.label_sequence(
                     pre_label_words, nbest).split('\n\n')
                 result_words.extend(self.segment(labels, pre_label_words))
+                pre_label_words = []
                 result_words.append(word)
         if pre_label_words:
             labels = self.label_sequence(pre_label_words, nbest).split('\n\n')
