@@ -1,4 +1,4 @@
-#encoding:utf-8
+# encoding:utf-8
 import re
 
 CN_NUM = {
@@ -44,10 +44,23 @@ CN_UNIT = {
 
 has_unit = re.compile((u'+[*?]*|'.join(CN_UNIT.keys())), re.UNICODE).findall
 
-chinese_number_regex = '^['+u''.join(
-    list(CN_UNIT.keys()) + list(CN_NUM.keys()))+']+$'
+chinese_unit_regex = '^[' + u''.join(list(CN_NUM.keys())) + ']+$'
+chinese_number_regex = '^[' + u''.join(
+    list(CN_UNIT.keys()) + list(CN_NUM.keys())) + ']+$'
 
-is_chinese_number = re.compile(chinese_number_regex, re.UNICODE).match
+chinese_unit_match = re.compile(chinese_unit_regex, re.UNICODE).match
+chinese_number_match = re.compile(chinese_number_regex, re.UNICODE).match
+
+
+def is_chinese_number(text):
+    unit_match = chinese_unit_match(text)
+    number_match = chinese_number_match(text)
+
+    if number_match and not unit_match:
+        return True
+    elif unit_match and text in CN_UNIT[:2]:
+        return True
+    return False
 
 
 def chinese_to_number(cn):
@@ -73,7 +86,7 @@ def chinese_to_number(cn):
         else:
             dig = CN_NUM.get(cndig)
             if unit:
-                dig = dig*unit
+                dig = dig * unit
                 unit = 0
             ldig.append(dig)
     if unit == 10:  # 处理10-19的数字
