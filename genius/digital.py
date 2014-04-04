@@ -12,6 +12,7 @@ CN_NUM = {
     u'七': 7,
     u'八': 8,
     u'九': 9,
+    u'十': 10,
 
     u'零': 0,
     u'壹': 1,
@@ -23,6 +24,7 @@ CN_NUM = {
     u'柒': 7,
     u'捌': 8,
     u'玖': 9,
+    u'拾': 10,
 
     u'貮': 2,
     u'两': 2,
@@ -58,7 +60,7 @@ def is_chinese_number(text):
 
     if number_match and not unit_match:
         return True
-    elif unit_match and text in (u'十', u'拾'):
+    elif unit_match and number_match:
         return True
     return False
 
