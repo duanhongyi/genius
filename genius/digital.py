@@ -58,7 +58,7 @@ def is_chinese_number(text):
 
     if number_match and not unit_match:
         return True
-    elif unit_match and text in CN_UNIT[:2]:
+    elif unit_match and text in (u'十', u'拾'):
         return True
     return False
 
