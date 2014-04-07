@@ -12,7 +12,6 @@ CN_NUM = {
     u'七': 7,
     u'八': 8,
     u'九': 9,
-    u'十': 10,
 
     u'零': 0,
     u'壹': 1,
@@ -24,7 +23,6 @@ CN_NUM = {
     u'柒': 7,
     u'捌': 8,
     u'玖': 9,
-    u'拾': 10,
 
     u'貮': 2,
     u'两': 2,
@@ -44,72 +42,55 @@ CN_UNIT = {
 }
 
 
-has_unit = re.compile((u'+[*?]*|'.join(CN_UNIT.keys())), re.UNICODE).findall
+cn_unit_match = re.compile(
+    '^[%s]+$' % u''.join(list(CN_UNIT.keys())),
+    re.UNICODE
+).match
 
-chinese_unit_regex = '^[' + u''.join(list(CN_NUM.keys())) + ']+$'
-chinese_number_regex = '^[' + u''.join(
-    list(CN_UNIT.keys()) + list(CN_NUM.keys())) + ']+$'
+cn_number_match = re.compile(
+    '^[%s]+$' % u''.join(list(CN_NUM.keys())),
+    re.UNICODE
+).match
 
-chinese_unit_match = re.compile(chinese_unit_regex, re.UNICODE).match
-chinese_number_match = re.compile(chinese_number_regex, re.UNICODE).match
+cn_number_unit_match = re.compile(
+    '^[%s]+$' % u''.join((list(CN_NUM.keys()) + list(CN_UNIT.keys()))),
+    re.UNICODE
+).match
 
 
 def is_chinese_number(text):
-    unit_match = chinese_unit_match(text)
-    number_match = chinese_number_match(text)
-
-    if number_match and not unit_match:
-        return True
-    elif unit_match and number_match:
-        return True
+    if cn_number_unit_match(text):
+        if text[0] not in CN_UNIT or CN_UNIT[text[0]] == 10:
+            try:
+                chinese_to_number(text)
+                return True
+            except ValueError:
+                return False
     return False
 
 
-def chinese_to_number(cn):
-    if not has_unit(cn):
-        return int(''.join([str(CN_NUM[c]) for c in cn]))
-    lcn = list(cn)
-    unit = 0  # 当前的单位
-    ldig = []  # 临时数组
-    while lcn:
-        cndig = lcn.pop()
-        if cndig in CN_UNIT:
-            unit = CN_UNIT.get(cndig)
-            if unit == 10000:
-                ldig.append('w')  # 标示万位
-                unit = 1
-            elif unit == 100000000:
-                ldig.append('y')  # 标示亿位
-                unit = 1
-            elif unit == 1000000000000:  # 标示兆位
-                ldig.append('z')
-                unit = 1
-            continue
+def chinese_to_number(text):
+    if cn_number_match(text):
+        return int(''.join([str(CN_NUM[c]) for c in text]))
+    words = list(text)
+    num, unit, result = 0, 0, 0
+    for word in words:
+        if word in CN_UNIT:
+            unit = CN_UNIT[word]
+            if unit in (10000, 100000000, 1000000000000):
+                result = (result + num) * unit
+            else:
+                if num == 0 and unit == 10:
+                    result += unit
+                elif num != 0:
+                    result += num * unit
+                else:
+                    raise ValueError
+            num = 0
         else:
-            dig = CN_NUM.get(cndig)
-            if unit:
-                dig = dig * unit
-                unit = 0
-            ldig.append(dig)
-    if unit == 10:  # 处理10-19的数字
-        ldig.append(10)
-    ret = 0
-    tmp = 0
-    while ldig:
-        x = ldig.pop()
-        if x == 'w':
-            tmp *= 10000
-            ret += tmp
-            tmp = 0
-        elif x == 'y':
-            tmp *= 100000000
-            ret += tmp
-            tmp = 0
-        elif x == 'z':
-            tmp *= 1000000000000
-            ret += tmp
-            tmp = 0
-        else:
-            tmp += x
-    ret += tmp
-    return ret
+            if num != 0:
+                raise ValueError
+            num = CN_NUM[word]
+            if num == 0:
+                unit = 10
+    return result + (unit/10 * num)
