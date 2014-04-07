@@ -43,12 +43,12 @@ CN_UNIT = {
 
 
 cn_unit_match = re.compile(
-    '^[%s]+$' % u''.join(list(CN_UNIT.keys())),
+    '^[%s]+$' % u''.join(CN_UNIT.keys()),
     re.UNICODE
 ).match
 
 cn_number_match = re.compile(
-    '^[%s]+$' % u''.join(list(CN_NUM.keys())),
+    '^[%s]+$' % u''.join(CN_NUM.keys()),
     re.UNICODE
 ).match
 
