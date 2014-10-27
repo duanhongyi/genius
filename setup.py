@@ -23,7 +23,7 @@ CHANGES = read_text(os.path.join(here, 'CHANGES.txt'))
 requires = [
     'six',
     'nose',
-    'libwapiti',
+    'libwapiti>=0.2.1',
     'setuptools>=1.0',
 ]
 
@@ -32,7 +32,7 @@ setup(
 
     name='genius',
     description='genius中文分词 Chinese Segment On linear-chain CRF',
-    version='3.1.5',
+    version='3.1.6',
     author='duanhongyi',
     author_email='duanhyi@gmail.com',
     packages=find_packages(),
