@@ -11,7 +11,7 @@ changes_file = os.path.join(here, 'CHANGES.txt')
 
 def read_text(file_path):
     """
-    fix the default operating system encoding is not utf8
+    fix the default operating system encoding is not utf8.
     """
     if sys.version_info.major < 3:
         return open(file_path).read()
@@ -32,7 +32,7 @@ setup(
 
     name='genius',
     description='genius中文分词 Chinese Segment On linear-chain CRF',
-    version='3.1.4',
+    version='3.1.5',
     author='duanhongyi',
     author_email='duanhyi@gmail.com',
     packages=find_packages(),
