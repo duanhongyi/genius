@@ -1,12 +1,24 @@
 #coding:utf-8
 
 import os
+import sys
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
+readme_file = os.path.join(here, 'README.md')
+changes_file = os.path.join(here, 'CHANGES.txt')
+
+def read_text(file_path):
+    """
+    fix the default operating system encoding is not utf8
+    """
+    if sys.version_info.major < 3:
+        return open(file_path).read()
+    return open(file_path, encoding="utf8").read()
+
+README = read_text(os.path.join(here, 'README.md'))
+CHANGES = read_text(os.path.join(here, 'CHANGES.txt'))
 
 requires = [
     'six',
