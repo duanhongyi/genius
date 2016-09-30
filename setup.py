@@ -22,9 +22,12 @@ CHANGES = read_text(os.path.join(here, 'CHANGES.txt'))
 
 requires = [
     'six',
-    'nose',
     'libwapiti>=0.2.1',
     'setuptools>=1.0',
+]
+
+test_requirements = [
+    'nose',
 ]
 
 
@@ -40,6 +43,7 @@ setup(
     long_description=README + '\n\n' + CHANGES,
     url='https://github.com/duanhongyi/genius',
     install_requires=requires,
+    tests_require=test_requirements,
     platforms='all platform',
     license='BSD',
 )
