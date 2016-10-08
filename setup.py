@@ -14,8 +14,10 @@ def read_text(file_path):
     fix the default operating system encoding is not utf8.
     """
     if sys.version_info.major < 3:
-        return open(file_path).read()
-    return open(file_path, encoding="utf8").read()
+        with open(file_path) as f:
+            return f.read()
+    with open(file_path, encoding="utf8") as f:
+        return f.read()
 
 README = read_text(os.path.join(here, 'README.md'))
 CHANGES = read_text(os.path.join(here, 'CHANGES.txt'))
