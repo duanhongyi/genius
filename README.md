@@ -71,7 +71,7 @@ Algorithm
 
 功能 3)：关键词提取
 ==============
-* `genius.tag_extract`方法专门为提取tag关键字准备，其中text是必填参数。
+* `genius.extract_tag`方法专门为提取tag关键字准备，其中text是必填参数。
 * `text`第一个参数为需要分词的字符 
 * `use_break`代表对分词结构进行打断处理，默认值`True`
 * `use_combine`代表是否使用字典进行词合并，默认值`False`
